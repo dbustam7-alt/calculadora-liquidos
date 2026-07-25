@@ -22,7 +22,10 @@
 - [x] Módulo 3: Cetoacidosis Diabética (Bolos, déficit a $24-48\text{ h}$, infusión de insulina y Sodio corregido).
 - [x] Módulo 4: Enfermedad Diarreica Aguda (EDA) y evaluación de deshidratación según OMS.
 
-## Phase 5: Persistence, Deployment & Delivery
+## Phase 5: Persistence, Security & Deployment
 - [x] Guardado de consultas y resúmenes clínicos en Supabase PostgreSQL (`patient_consultations`) con fallback en `localStorage`.
 - [x] Módulo de Historial con búsqueda por paciente, filtro por fecha y vista detallada desplegable.
-- [ ] Vinculación a repositorio en GitHub y despliegue continuo en Vercel (Listo para producción).
+- [x] Implementación de Autenticación con Supabase Auth (Registro e Inicio de Sesión).
+- [x] Registro expandido con datos profesionales (Nombre, Especialidad, Hospital, Registro Médico).
+- [x] Integración de Inicio de Sesión con Google (Google OAuth).
+- [x] Vinculación a repositorio en GitHub y despliegue continuo en Vercel (Listo para producción).

@@ -30,6 +30,19 @@ export const supabase = isSupabaseConfigured
     })
   : null;
 
+/**
+ * Dynamically determines the site URL for OAuth redirects and email confirmations.
+ */
+export function getSiteURL(): string {
+  let url =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000/');
+  
+  // Ensure trailing slash
+  url = url.endsWith('/') ? url : `${url}/`;
+  return url;
+}
+
 // --- OFFLINE-FIRST LOCALSTORAGE FALLBACK SERVICE ---
 
 const LOCAL_STORAGE_KEY = 'pediatricode_consultations';

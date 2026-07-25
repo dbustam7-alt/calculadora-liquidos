@@ -213,8 +213,18 @@ export default function PatientHeader() {
           {user && (
             <div className="hidden lg:flex items-center gap-3 pl-4 border-l border-slate-100">
               <div className="text-right">
-                <span className="text-[10px] font-bold text-slate-400 block uppercase">Usuario Activo</span>
-                <span className="text-xs font-semibold text-slate-700 block max-w-[150px] truncate">{user.email}</span>
+                <span className="text-[10px] font-bold text-slate-400 block uppercase">
+                  {user.user_metadata?.specialty ? (
+                    user.user_metadata.specialty === 'pediatria' ? 'Pediatría' :
+                    user.user_metadata.specialty === 'urgencias_pediatricas' ? 'Urgencias Pediátricas' :
+                    user.user_metadata.specialty === 'medicina_general' ? 'Medicina General' :
+                    user.user_metadata.specialty === 'residente_pediatria' ? 'Residente Pediatría' :
+                    user.user_metadata.specialty === 'enfermeria_pediatrica' ? 'Enfermería Ped.' : 'Médico'
+                  ) : 'Usuario Activo'}
+                </span>
+                <span className="text-xs font-semibold text-slate-700 block max-w-[150px] truncate" title={user.user_metadata?.full_name || user.email}>
+                  {user.user_metadata?.full_name || user.email}
+                </span>
               </div>
               <button
                 onClick={signOut}

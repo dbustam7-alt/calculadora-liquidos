@@ -8,17 +8,18 @@ All core development phases are completed. The application is ready for deployme
 ### Infra Stack
 - **Framework**: Next.js 15+ (App Router) + TypeScript + Bun
 - **Styling**: Tailwind CSS v4 + Lucide Icons
-- **Database & Auth**: Supabase (PostgreSQL) with offline localStorage fallback
+- **Database & Auth**: Supabase (PostgreSQL) with offline localStorage fallback and Google OAuth + Clinical User Profiles
 - **Deployment & Versioning**: Vercel + GitHub
 
 ### Status Overview
 - **Project Context & Rules**: Initialized.
 - **Pure Clinical Formulas Engine**: Fully implemented and typed in `src/lib/formulas.ts`.
-- **Supabase Client & Fallback Service**: Configured in `src/lib/supabase.ts`.
+- **Supabase Client & Fallback Service**: Configured in `src/lib/supabase.ts` with dynamic redirect helper.
 - **Global Patient State Provider**: Implemented in `src/context/PatientContext.tsx`.
-- **Patient Header Component**: Implemented with real-time BSA (Mosteller) and safety alerts.
+- **Patient Header Component**: Implemented with real-time BSA (Mosteller), safety alerts, and dynamic user profile display.
 - **Clinical Modules**: Fully implemented (Maintenance, Burns, CAD, EDA/WHO).
 - **Consultations History Component**: Implemented with search, date filters, and expandables.
+- **Auth Screen**: Fully implemented with email/password login, Google OAuth, and an expanded clinical registration form (Full Name, Specialty, Hospital, Medical License).
 - **Main App Shell**: Assembled in `src/app/page.tsx` and `src/app/layout.tsx`.
 - **Production Build**: Verified and compiled successfully with zero errors.
 
@@ -28,13 +29,15 @@ All core development phases are completed. The application is ready for deployme
 - [x] Implement pure clinical formulas in `src/lib/formulas.ts`.
 - [x] Configure Supabase client with offline `localStorage` fallback.
 - [x] Create Patient global state provider (`PatientContext.tsx`).
-- [x] Build Patient Header component with real-time SC Mosteller.
+- [x] Build Patient Header component with real-time SC Mosteller and dynamic user metadata.
 - [x] Implement Clinical Modules (Maintenance, Burns, CAD, EDA/WHO).
 - [x] Implement Consultations History component with search and filters.
 - [x] Connect all components in the main app page.
+- [x] Implement Supabase Authentication (Sign up / Sign in) with email confirmation.
+- [x] Add Google OAuth sign-in option.
+- [x] Add clinical registration form to collect professional details (Full Name, Specialty, Hospital, Medical License).
 - [x] Verify production build and compilation.
 
 ### To Do Immediately
-- Connect the repository to GitHub.
-- Deploy the application on Vercel.
-- Configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel environment variables.
+- Push the latest authentication and registration updates to GitHub.
+- Ensure Vercel automatically deploys the latest main branch.
