@@ -296,26 +296,29 @@ export default function EdaModule() {
             <h3 className="font-bold text-slate-800 text-base">Plan de Hidratación Calculado</h3>
 
             {/* Plan Badge Highlight */}
-            <div className="flex items-center gap-4 bg-slate-50 border border-slate-100 rounded-2xl p-5">
-              <div className={`text-white text-3xl font-extrabold h-16 w-16 rounded-2xl flex items-center justify-center shadow-lg shrink-0 ${
-                hydration.recommendedPlan === 'A' ? 'bg-emerald-600 shadow-emerald-100' :
-                hydration.recommendedPlan === 'B' ? 'bg-amber-500 shadow-amber-100' :
-                'bg-rose-600 shadow-rose-100 animate-pulse-subtle'
-              }`}>
-                Plan {hydration.recommendedPlan}
-              </div>
+            <div className={`border rounded-2xl p-5 ${
+              hydration.recommendedPlan === 'A' ? 'bg-emerald-50/50 border-emerald-100' :
+              hydration.recommendedPlan === 'B' ? 'bg-amber-50/50 border-amber-100' :
+              'bg-rose-50/50 border-rose-100'
+            }`}>
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Plan de Manejo Clínico</span>
-                <span className="text-base font-bold text-slate-800">
+                <span className={`text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full ${
+                  hydration.recommendedPlan === 'A' ? 'bg-emerald-100 text-emerald-800' :
+                  hydration.recommendedPlan === 'B' ? 'bg-amber-100 text-amber-800' :
+                  'bg-rose-100 text-rose-800'
+                }`}>
+                  Plan {hydration.recommendedPlan}
+                </span>
+                <h4 className="text-base font-bold mt-2.5 text-slate-900">
                   {hydration.recommendedPlan === 'A' && 'Tratamiento en el Hogar'}
                   {hydration.recommendedPlan === 'B' && 'Rehidratación Oral (SRO)'}
                   {hydration.recommendedPlan === 'C' && 'Rehidratación Intravenosa Rápida'}
-                </span>
-                <span className="text-[10px] text-slate-500 block mt-0.5">
+                </h4>
+                <p className="text-xs text-slate-500 mt-1">
                   {hydration.recommendedPlan === 'A' && 'Sin signos suficientes de deshidratación.'}
                   {hydration.recommendedPlan === 'B' && 'Deshidratación moderada detectada.'}
                   {hydration.recommendedPlan === 'C' && 'Deshidratación grave. ¡Emergencia médica!'}
-                </span>
+                </p>
               </div>
             </div>
 
