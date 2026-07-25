@@ -2,7 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { calculateBSA } from '@/lib/formulas';
-import { getConsultations, saveConsultation, PatientConsultation, deleteConsultation as deleteDbConsultation } from '@/lib/supabase';
+import { getConsultations, saveConsultation, PatientConsultation, deleteConsultation as deleteDbConsultation, supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface PatientState {
   name: string;
@@ -13,6 +14,8 @@ interface PatientState {
   activeTab: 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'historial';
   history: PatientConsultation[];
   isLoadingHistory: boolean;
+  user: SupabaseUser | null;
+  isAuthLoading: boolean;
 }
 
 interface PatientContextType extends PatientState {
@@ -27,6 +30,7 @@ interface PatientContextType extends PatientState {
   ) => Promise<boolean>;
   deleteConsultation: (id: string) => Promise<boolean>;
   refreshHistory: () => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 const PatientContext = createContext<PatientContextType | undefined>(undefined);
@@ -46,6 +50,34 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
   const [history, setHistory] = useState<PatientConsultation[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false);
 
+  // Auth state
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+
+  // Listen to Auth changes
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) {
+      setIsAuthLoading(false);
+      return;
+    }
+
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setIsAuthLoading(false);
+    });
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setIsAuthLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   // Calculate BSA automatically whenever weight or height changes
   useEffect(() => {
     const calculatedBsa = calculateBSA(weightKg, heightCm);
@@ -54,6 +86,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
 
   // Fetch consultations history
   const refreshHistory = useCallback(async () => {
+    if (isAuthLoading) return;
     setIsLoadingHistory(true);
     try {
       const { data, error } = await getConsultations();
@@ -65,12 +98,12 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoadingHistory(false);
     }
-  }, []);
+  }, [isAuthLoading]);
 
-  // Fetch history on mount
+  // Fetch history when auth finishes loading or user changes
   useEffect(() => {
     refreshHistory();
-  }, [refreshHistory]);
+  }, [refreshHistory, user]);
 
   // Save current consultation
   const saveCurrentConsultation = async (
@@ -115,6 +148,15 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Sign out function
+  const signOut = async () => {
+    if (supabase) {
+      await supabase.auth.signOut();
+      // Clear history upon signout
+      setHistory([]);
+    }
+  };
+
   return (
     <PatientContext.Provider
       value={{
@@ -126,6 +168,8 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
         activeTab,
         history,
         isLoadingHistory,
+        user,
+        isAuthLoading,
         setName,
         setAgeMonths,
         setWeightKg,
@@ -134,6 +178,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
         saveCurrentConsultation,
         deleteConsultation,
         refreshHistory,
+        signOut,
       }}
     >
       {children}

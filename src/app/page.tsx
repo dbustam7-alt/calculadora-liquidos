@@ -8,9 +8,25 @@ import BurnsModule from '@/components/BurnsModule';
 import DkaModule from '@/components/DkaModule';
 import EdaModule from '@/components/EdaModule';
 import ConsultationsHistory from '@/components/ConsultationsHistory';
+import AuthScreen from '@/components/AuthScreen';
 
 export default function Home() {
-  const { activeTab } = usePatient();
+  const { activeTab, user, isAuthLoading } = usePatient();
+
+  // Show loading spinner while checking auth session
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-sky-600 mb-4"></div>
+        <p className="text-sm text-slate-500 font-medium">Verificando sesión clínica...</p>
+      </div>
+    );
+  }
+
+  // If user is not authenticated, render the Auth Screen
+  if (!user) {
+    return <AuthScreen />;
+  }
 
   const renderActiveModule = () => {
     switch (activeTab) {

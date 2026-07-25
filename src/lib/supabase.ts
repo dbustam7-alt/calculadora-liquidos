@@ -11,6 +11,7 @@ export interface PatientConsultation {
   consultation_type: 'mantenimiento' | 'quemaduras' | 'cad' | 'eda';
   details: Record<string, any>;
   created_at: string;
+  user_id?: string; // Tied to the authenticated user
 }
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -21,7 +22,12 @@ export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
 
 // Initialize Supabase client if configured, otherwise null
 export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+      }
+    })
   : null;
 
 // --- OFFLINE-FIRST LOCALSTORAGE FALLBACK SERVICE ---
@@ -75,15 +81,20 @@ export async function saveConsultation(
 
   if (isSupabaseConfigured && supabase) {
     try {
+      // Get current session to attach user_id
+      const { data: { session } } = await supabase.auth.getSession();
+      const user_id = session?.user?.id;
+
+      const payload = user_id ? { ...newConsultation, user_id } : newConsultation;
+
       const { data, error } = await supabase
         .from('patient_consultations')
-        .insert([newConsultation])
+        .insert([payload])
         .select()
         .single();
 
       if (error) {
         console.warn('Supabase insert failed, using local storage backup:', error);
-        // We don't throw an error since we have local storage backup
         return { data: newConsultation, error: null };
       }
 
@@ -94,7 +105,6 @@ export async function saveConsultation(
     }
   }
 
-  // If Supabase is not configured, we succeed silently with localStorage
   return { data: newConsultation, error: null };
 }
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePatient } from '@/context/PatientContext';
-import { User, Calendar, Weight, Ruler, Activity, Droplets, Flame, Syringe, Stethoscope, Clock } from 'lucide-react';
+import { User, Calendar, Weight, Ruler, Activity, Droplets, Flame, Syringe, Stethoscope, Clock, LogOut } from 'lucide-react';
 import ClinicalAlert from './ClinicalAlert';
 import { clsx } from 'clsx';
 
@@ -14,11 +14,13 @@ export default function PatientHeader() {
     heightCm,
     bsa,
     activeTab,
+    user,
     setName,
     setAgeMonths,
     setWeightKg,
     setHeightCm,
     setActiveTab,
+    signOut,
   } = usePatient();
 
   // Local state for age in years helper
@@ -56,15 +58,28 @@ export default function PatientHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
         {/* Top Branding & Patient Info Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center mb-3">
-          {/* Brand Logo / Title */}
-          <div className="lg:col-span-3 flex items-center gap-2">
-            <div className="bg-sky-600 text-white p-2 rounded-xl shadow-md shadow-sky-100">
-              <Activity className="h-6 w-6" />
+          {/* Brand Logo / Title & User Info */}
+          <div className="lg:col-span-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="bg-sky-600 text-white p-2 rounded-xl shadow-md shadow-sky-100">
+                <Activity className="h-6 w-6" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-slate-900 leading-tight">PediatriCode</h1>
+                <p className="text-xs text-slate-500 font-medium">Urgencias Pediátricas</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-slate-900 leading-tight">PediatriCode</h1>
-              <p className="text-xs text-slate-500 font-medium">Urgencias Pediátricas</p>
-            </div>
+
+            {/* Mobile Sign Out */}
+            {user && (
+              <button
+                onClick={signOut}
+                className="lg:hidden p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer"
+                title="Cerrar Sesión"
+              >
+                <LogOut className="h-5 w-5" />
+              </button>
+            )}
           </div>
 
           {/* Patient Inputs Grid */}
@@ -171,8 +186,8 @@ export default function PatientHeader() {
           </div>
         )}
 
-        {/* Navigation Tabs */}
-        <div className="flex border-t border-slate-100 mt-2 overflow-x-auto scrollbar-none">
+        {/* Navigation Tabs & Desktop Sign Out */}
+        <div className="flex items-center justify-between border-t border-slate-100 mt-2 overflow-x-auto scrollbar-none">
           <nav className="flex space-x-1 py-1 min-w-max" aria-label="Tabs">
             {tabs.map((tab) => {
               const isSelected = activeTab === tab.id;
@@ -193,6 +208,23 @@ export default function PatientHeader() {
               );
             })}
           </nav>
+
+          {/* Desktop User Info & Sign Out */}
+          {user && (
+            <div className="hidden lg:flex items-center gap-3 pl-4 border-l border-slate-100">
+              <div className="text-right">
+                <span className="text-[10px] font-bold text-slate-400 block uppercase">Usuario Activo</span>
+                <span className="text-xs font-semibold text-slate-700 block max-w-[150px] truncate">{user.email}</span>
+              </div>
+              <button
+                onClick={signOut}
+                className="flex items-center justify-center p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer"
+                title="Cerrar Sesión"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>
