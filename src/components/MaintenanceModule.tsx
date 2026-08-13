@@ -3,20 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { usePatient } from '@/context/PatientContext';
 import { calculateHollidaySegar, calculateBsaMaintenance } from '@/lib/formulas';
-import { Droplet, Info, Save, CheckCircle2 } from 'lucide-react';
+import { Droplet, Info, Save, CheckCircle2, AlertCircle, Check } from 'lucide-react';
 import ClinicalAlert from './ClinicalAlert';
 
 export default function MaintenanceModule() {
   const { weightKg, bsa, saveCurrentConsultation } = usePatient();
 
-  // Custom inputs for BSA-based maintenance
-  const [fluidReqM2, setFluidReqM2] = useState<number>(1500);
-  const [naReqM2, setNaReqM2] = useState<number>(40);
-  const [kReqM2, setKReqM2] = useState<number>(20);
-
   // Results
   const [holliday, setHolliday] = useState(calculateHollidaySegar(weightKg));
-  const [bsaMaint, setBsaMaint] = useState(calculateBsaMaintenance(bsa, fluidReqM2, naReqM2, kReqM2));
+  const [bsaMaint, setBsaMaint] = useState(calculateBsaMaintenance(bsa));
 
   // Saving state
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -25,18 +20,20 @@ export default function MaintenanceModule() {
   // Recalculate when inputs change
   useEffect(() => {
     setHolliday(calculateHollidaySegar(weightKg));
-  }, [weightKg]);
+    setBsaMaint(calculateBsaMaintenance(bsa));
+  }, [weightKg, bsa]);
 
-  useEffect(() => {
-    setBsaMaint(calculateBsaMaintenance(bsa, fluidReqM2, naReqM2, kReqM2));
-  }, [bsa, fluidReqM2, naReqM2, kReqM2]);
+  const isWeightUnder30 = weightKg <= 30;
 
   const handleSave = async () => {
     setIsSaving(true);
     setSaveSuccess(false);
 
     const details = {
-      method: 'Holliday-Segar & Superficie Corporal',
+      method: 'Líquidos de Mantenimiento',
+      recommendedMethod: isWeightUnder30 ? 'Holliday-Segar' : 'Superficie Corporal',
+      weightKg,
+      bsa,
       holliday: {
         dailyVolumeMl: holliday.dailyVolumeMl,
         hourlyRateMlh: holliday.hourlyRateMlh,
@@ -44,13 +41,10 @@ export default function MaintenanceModule() {
         microdropsPerMin: holliday.microdropsPerMin,
       },
       bsaBased: {
-        inputs: { fluidReqM2, naReqM2, kReqM2 },
-        results: {
-          dailyVolumeMl: bsaMaint.dailyVolumeMl,
-          hourlyRateMlh: bsaMaint.hourlyRateMlh,
-          naTotalMeq: bsaMaint.naTotalMeq,
-          kTotalMeq: bsaMaint.kTotalMeq,
-        },
+        dailyVolumeMlMin: bsaMaint.dailyVolumeMlMin,
+        dailyVolumeMlMax: bsaMaint.dailyVolumeMlMax,
+        hourlyRateMlhMin: bsaMaint.hourlyRateMlhMin,
+        hourlyRateMlhMax: bsaMaint.hourlyRateMlhMax,
       },
     };
 
@@ -67,35 +61,61 @@ export default function MaintenanceModule() {
       {/* Module Title */}
       <div className="flex items-center gap-2">
         <Droplet className="h-6 w-6 text-sky-600" />
-        <h2 className="text-xl font-bold text-slate-900">Líquidos y Electrólitos de Mantenimiento</h2>
+        <h2 className="text-xl font-bold text-slate-900">Líquidos de Mantenimiento</h2>
+      </div>
+
+      {/* Dynamic Recommendation Alert */}
+      <div className="animate-fade-in">
+        <ClinicalAlert
+          type={isWeightUnder30 ? 'info' : 'warning'}
+          title={isWeightUnder30 ? 'Indicación: Método Holliday-Segar' : 'Indicación: Método por Superficie Corporal'}
+          message={
+            isWeightUnder30
+              ? `Paciente con peso de ${weightKg} kg (≤ 30 kg). Se recomienda utilizar el método estándar de Holliday-Segar para el cálculo de líquidos basales.`
+              : `Paciente con peso de ${weightKg} kg (> 30 kg). Se recomienda utilizar el método de Superficie Corporal (SC) para evitar sobrehidratación.`
+          }
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Holliday-Segar Card */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+        <div className={`bg-white border rounded-2xl p-6 shadow-sm flex flex-col justify-between transition-all duration-300 ${
+          isWeightUnder30 
+            ? 'border-sky-500 ring-2 ring-sky-100' 
+            : 'border-slate-200 opacity-75 hover:opacity-100'
+        }`}>
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-slate-800 text-base">Método Holliday-Segar</h3>
+              <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
+                Método Holliday-Segar
+                {isWeightUnder30 && <span className="bg-sky-100 text-sky-800 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Recomendado</span>}
+              </h3>
               <span className="bg-sky-50 text-sky-700 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full border border-sky-100">
                 Basado en Peso
               </span>
             </div>
             <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-              Método fisiológico estándar de oro para calcular líquidos basales en pediatría según el peso del paciente.
+              Método fisiológico estándar para calcular líquidos de mantenimiento en niños con peso menor o igual a 30 kg.
             </p>
 
             {/* Results Grid */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Volumen Diario</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Volumen Diario (24h)</span>
                 <span className="text-xl font-bold font-mono text-slate-800">
                   {holliday.dailyVolumeMl} <span className="text-xs font-semibold text-slate-500">mL/día</span>
                 </span>
               </div>
-              <div className="bg-sky-50/50 rounded-xl p-4 border border-sky-100/50">
-                <span className="text-[10px] uppercase font-bold text-sky-600 block mb-1">Tasa de Infusión</span>
-                <span className="text-xl font-bold font-mono text-sky-700">
-                  {holliday.hourlyRateMlh} <span className="text-xs font-semibold text-sky-500">mL/h</span>
+              <div className={`rounded-xl p-4 border transition-all ${
+                isWeightUnder30 ? 'bg-sky-50 border-sky-100' : 'bg-slate-50 border-slate-100'
+              }`}>
+                <span className={`text-[10px] uppercase font-bold block mb-1 ${
+                  isWeightUnder30 ? 'text-sky-600' : 'text-slate-400'
+                }`}>Tasa de Infusión</span>
+                <span className={`text-xl font-bold font-mono ${
+                  isWeightUnder30 ? 'text-sky-700' : 'text-slate-800'
+                }`}>
+                  {holliday.hourlyRateMlh} <span className="text-xs font-semibold text-slate-500">mL/h</span>
                 </span>
               </div>
               <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
@@ -113,100 +133,76 @@ export default function MaintenanceModule() {
             </div>
           </div>
 
-          <ClinicalAlert
-            type="info"
-            title="Regla Holliday-Segar"
-            message="100 mL/kg para los primeros 10 kg; 50 mL/kg para los siguientes 10 kg; y 20 mL/kg por cada kg adicional."
-          />
+          <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100 text-xs text-slate-600 space-y-1">
+            <div className="font-bold text-slate-700 mb-1 flex items-center gap-1">
+              <Info className="h-3.5 w-3.5 text-sky-600" /> Regla de Cálculo:
+            </div>
+            <p className="leading-relaxed">
+              • <strong>1 a 10 kg:</strong> 100 mL por cada kg.
+            </p>
+            <p className="leading-relaxed">
+              • <strong>10 a 20 kg:</strong> 1000 mL + 50 mL por cada kg mayor a 10 kg.
+            </p>
+            <p className="leading-relaxed">
+              • <strong>20 a 30 kg:</strong> 1500 mL + 20 mL por cada kg mayor a 20 kg.
+            </p>
+          </div>
         </div>
 
         {/* BSA-Based Maintenance Card */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+        <div className={`bg-white border rounded-2xl p-6 shadow-sm flex flex-col justify-between transition-all duration-300 ${
+          !isWeightUnder30 
+            ? 'border-emerald-500 ring-2 ring-emerald-100' 
+            : 'border-slate-200 opacity-75 hover:opacity-100'
+        }`}>
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-slate-800 text-base">Método por Superficie Corporal (SC)</h3>
+              <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
+                Método por Superficie Corporal
+                {!isWeightUnder30 && <span className="bg-emerald-100 text-emerald-800 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Recomendado</span>}
+              </h3>
               <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full border border-emerald-100">
                 Basado en SC
               </span>
             </div>
-            <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-              Recomendado para niños mayores de 10 kg o adolescentes. Permite ajustar requerimientos específicos de líquidos y electrólitos.
+            <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+              Método recomendado para niños mayores de 30 kg para calcular líquidos basales en base a su Superficie Corporal (SCT).
             </p>
-
-            {/* Parameter Adjustment Inputs */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-slate-500 mb-1">Líquidos (mL/m²/d)</label>
-                <input
-                  type="number"
-                  min="1000"
-                  max="2000"
-                  step="50"
-                  value={fluidReqM2}
-                  onChange={(e) => setFluidReqM2(Math.max(1000, parseInt(e.target.value) || 1000))}
-                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 focus:border-emerald-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all font-mono text-slate-900 text-center"
-                />
-              </div>
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-slate-500 mb-1">Sodio (mEq/m²/d)</label>
-                <input
-                  type="number"
-                  min="10"
-                  max="100"
-                  step="5"
-                  value={naReqM2}
-                  onChange={(e) => setNaReqM2(Math.max(10, parseInt(e.target.value) || 10))}
-                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 focus:border-emerald-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all font-mono text-slate-900 text-center"
-                />
-              </div>
-              <div>
-                <label className="block text-[9px] uppercase font-bold text-slate-500 mb-1">Potasio (mEq/m²/d)</label>
-                <input
-                  type="number"
-                  min="10"
-                  max="100"
-                  step="5"
-                  value={kReqM2}
-                  onChange={(e) => setKReqM2(Math.max(10, parseInt(e.target.value) || 10))}
-                  className="w-full px-2.5 py-1.5 text-xs bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 focus:border-emerald-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all font-mono text-slate-900 text-center"
-                />
-              </div>
-            </div>
 
             {/* Results Grid */}
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Volumen Diario</span>
+              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 col-span-2">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Volumen Diario Sugerido (24h)</span>
                 <span className="text-xl font-bold font-mono text-slate-800">
-                  {bsaMaint.dailyVolumeMl} <span className="text-xs font-semibold text-slate-500">mL/día</span>
+                  {bsaMaint.dailyVolumeMlMin} - {bsaMaint.dailyVolumeMlMax} <span className="text-xs font-semibold text-slate-500">mL/día</span>
                 </span>
               </div>
-              <div className="bg-emerald-50/50 rounded-xl p-4 border border-emerald-100/50">
-                <span className="text-[10px] uppercase font-bold text-emerald-600 block mb-1">Tasa de Infusión</span>
-                <span className="text-xl font-bold font-mono text-emerald-700">
-                  {bsaMaint.hourlyRateMlh} <span className="text-xs font-semibold text-slate-500">mL/h</span>
-                </span>
-              </div>
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Sodio Basal Total</span>
-                <span className="text-xl font-bold font-mono text-slate-800">
-                  {bsaMaint.naTotalMeq} <span className="text-xs font-semibold text-slate-500">mEq/día</span>
-                </span>
-              </div>
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Potasio Basal Total</span>
-                <span className="text-xl font-bold font-mono text-slate-800">
-                  {bsaMaint.kTotalMeq} <span className="text-xs font-semibold text-slate-500">mEq/día</span>
+              <div className={`rounded-xl p-4 border transition-all col-span-2 ${
+                !isWeightUnder30 ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'
+              }`}>
+                <span className={`text-[10px] uppercase font-bold block mb-1 ${
+                  !isWeightUnder30 ? 'text-emerald-600' : 'text-slate-400'
+                }`}>Tasa de Infusión Sugerida</span>
+                <span className={`text-xl font-bold font-mono ${
+                  !isWeightUnder30 ? 'text-emerald-700' : 'text-slate-800'
+                }`}>
+                  {bsaMaint.hourlyRateMlhMin} - {bsaMaint.hourlyRateMlhMax} <span className="text-xs font-semibold text-slate-500">mL/h</span>
                 </span>
               </div>
             </div>
           </div>
 
-          <ClinicalAlert
-            type="success"
-            title="Requerimientos Estándar"
-            message="Líquidos: 1200-1800 mL/m²/día. Sodio: 30-50 mEq/m²/día. Potasio: 20-40 mEq/m²/día."
-          />
+          <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100 text-xs text-slate-600 space-y-1">
+            <div className="font-bold text-slate-700 mb-1 flex items-center gap-1">
+              <Info className="h-3.5 w-3.5 text-emerald-600" /> Regla de Cálculo:
+            </div>
+            <p className="leading-relaxed">
+              • <strong>Rango de líquidos:</strong> 1500 a 1800 mL por m² de Superficie Corporal al día.
+            </p>
+            <p className="leading-relaxed">
+              • <strong>Superficie Corporal ({bsa.toFixed(3)} m²):</strong> Calculada automáticamente en base al peso del paciente.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -224,7 +220,7 @@ export default function MaintenanceModule() {
 
         <button
           onClick={handleSave}
-          disabled={isSaving || holliday.dailyVolumeMl === 0}
+          disabled={isSaving || weightKg <= 0}
           className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-sky-600 hover:bg-sky-700 disabled:bg-slate-300 text-white font-bold text-sm rounded-xl shadow-lg shadow-sky-100 hover:shadow-sky-200 disabled:shadow-none transition-all duration-200 cursor-pointer"
         >
           {saveSuccess ? (

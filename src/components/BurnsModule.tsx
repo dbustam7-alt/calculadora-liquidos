@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePatient } from '@/context/PatientContext';
-import { getAgeGroup, calculateParkland, LUND_BROWDER_CHART, AgeGroup } from '@/lib/formulas';
+import { getAgeGroup, calculateBurns, LUND_BROWDER_CHART, AgeGroup } from '@/lib/formulas';
 import { Flame, Info, Save, CheckCircle2, Plus, Minus } from 'lucide-react';
 import ClinicalAlert from './ClinicalAlert';
 
@@ -11,6 +11,12 @@ export default function BurnsModule() {
 
   // Mode: 'direct' (direct % TBSA) or 'lund' (Lund-Browder calculator)
   const [inputMode, setInputMode] = useState<'direct' | 'lund'>('direct');
+
+  // Formula: 'Galveston' or 'Parkland' (Parkland Modificado)
+  const [formula, setFormula] = useState<'Galveston' | 'Parkland'>('Galveston');
+
+  // Burn Type: 'thermal' or 'inhalation'
+  const [burnType, setBurnType] = useState<'thermal' | 'inhalation'>('thermal');
 
   // Direct %SCQ input
   const [directScq, setDirectScq] = useState<number>(10);
@@ -49,8 +55,8 @@ export default function BurnsModule() {
   // Final %SCQ to use in calculations
   const finalScq = inputMode === 'direct' ? directScq : calculatedScq;
 
-  // Parkland results
-  const results = calculateParkland(weightKg, finalScq);
+  // Calculate results
+  const results = calculateBurns(weightKg, finalScq, formula, ageMonths, burnType);
 
   // Saving state
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -61,7 +67,9 @@ export default function BurnsModule() {
     setSaveSuccess(false);
 
     const details = {
-      method: 'Parkland & Lund-Browder',
+      method: 'Quemaduras - ' + (formula === 'Galveston' ? 'Galveston' : 'Parkland Modificado'),
+      formula,
+      burnType: formula === 'Parkland' ? burnType : undefined,
       ageGroup,
       scqPercentage: finalScq,
       inputMode,
@@ -72,9 +80,9 @@ export default function BurnsModule() {
         firstEightHoursRateMlh: results.firstEightHoursRateMlh,
         nextSixteenHoursMl: results.nextSixteenHoursMl,
         nextSixteenHoursRateMlh: results.nextSixteenHoursRateMlh,
-        maintenanceDailyVolumeMl: results.maintenanceDailyVolumeMl,
-        combinedFirstEightHoursRateMlh: results.combinedFirstEightHoursRateMlh,
-        combinedNextSixteenHoursRateMlh: results.combinedNextSixteenHoursRateMlh,
+        sctM2: results.sctM2,
+        scqM2: results.scqM2,
+        maintenanceAddedMl: results.maintenanceAddedMl,
       },
     };
 
@@ -122,11 +130,67 @@ export default function BurnsModule() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Burn Estimation (Lund-Browder / Direct) */}
+        {/* Left Column: Burn Estimation & Configuration */}
         <div className="lg:col-span-7 space-y-6">
+          {/* Configuration Card */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+            <h3 className="font-bold text-slate-800 text-base border-b border-slate-100 pb-3">Configuración de Protocolo</h3>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Formula Option */}
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Fórmula de Cálculo</label>
+                <div className="flex bg-slate-100 p-1 rounded-xl">
+                  <button
+                    onClick={() => setFormula('Galveston')}
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                      formula === 'Galveston' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    Galveston
+                  </button>
+                  <button
+                    onClick={() => setFormula('Parkland')}
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                      formula === 'Parkland' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    Parkland Modificado
+                  </button>
+                </div>
+              </div>
+
+              {/* Burn Type (Only shown if Parkland is selected) */}
+              {formula === 'Parkland' && (
+                <div className="animate-fade-in">
+                  <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Tipo de Quemadura</label>
+                  <div className="flex bg-slate-100 p-1 rounded-xl">
+                    <button
+                      onClick={() => setBurnType('thermal')}
+                      className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                        burnType === 'thermal' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                      }`}
+                    >
+                      Térmica
+                    </button>
+                    <button
+                      onClick={() => setBurnType('inhalation')}
+                      className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                        burnType === 'inhalation' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                      }`}
+                    >
+                      Inhalación
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Estimation Card */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             {/* Mode Selector */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-3">
               <h3 className="font-bold text-slate-800 text-base">Estimación de Quemadura (% SCQ)</h3>
               <div className="flex bg-slate-100 p-1 rounded-xl">
                 <button
@@ -249,28 +313,41 @@ export default function BurnsModule() {
           )}
         </div>
 
-        {/* Right Column: Parkland Calculations */}
+        {/* Right Column: Calculations */}
         <div className="lg:col-span-5 space-y-6">
           <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-slate-800 text-base">Fórmula de Parkland</h3>
+                <h3 className="font-bold text-slate-800 text-base">
+                  {formula === 'Galveston' ? 'Fórmula de Galveston' : 'Fórmula de Parkland Modificada'}
+                </h3>
                 <span className="bg-rose-50 text-rose-700 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full border border-rose-100">
                   Resucitación 24h
                 </span>
               </div>
               <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-                Volumen total de Ringer Lactato calculado para las primeras 24 horas desde el momento de la quemadura.
+                {formula === 'Galveston'
+                  ? 'Calcula líquidos basales y de resucitación combinados en base a la Superficie Corporal Total y Quemada.'
+                  : 'Calcula líquidos de resucitación en base al peso y porcentaje de quemadura.'}
               </p>
 
-              {/* Parkland Volume Output */}
+              {/* Volume Output */}
               <div className="bg-rose-50/50 border border-rose-100/50 rounded-2xl p-5 text-center mb-6">
-                <span className="text-[10px] uppercase font-bold text-rose-600 block mb-1">Volumen Parkland Total</span>
+                <span className="text-[10px] uppercase font-bold text-rose-600 block mb-1">Volumen de Resucitación Total</span>
                 <span className="text-3xl font-bold font-mono text-rose-700">
                   {results.totalVolumeMl} <span className="text-sm font-semibold">mL</span>
                 </span>
                 <p className="text-[10px] text-slate-500 mt-2">
-                  (4 mL × {weightKg} kg × {finalScq}%)
+                  {formula === 'Galveston' ? (
+                    <>
+                      (5000 × {results.scqM2} m² SCQ) + (2000 × {results.sctM2} m² SCT)
+                    </>
+                  ) : (
+                    <>
+                      ({burnType === 'inhalation' ? '4' : '3'} mL × {weightKg} kg × {finalScq}%)
+                      {results.maintenanceAddedMl && ` + ${results.maintenanceAddedMl} mL Mantenimiento`}
+                    </>
+                  )}
                 </p>
               </div>
 
@@ -283,12 +360,8 @@ export default function BurnsModule() {
                     <span className="text-xs font-bold font-mono text-slate-800">{results.firstEightHoursMl} mL</span>
                   </div>
                   <div className="flex justify-between items-center text-xs text-slate-500">
-                    <span>Tasa de Resucitación:</span>
-                    <span className="font-mono font-semibold text-slate-700">{results.firstEightHoursRateMlh} mL/h</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs text-rose-600 font-medium mt-1 border-t border-dashed border-slate-200 pt-1">
-                    <span>+ Líquidos de Mantenimiento:</span>
-                    <span className="font-mono font-bold">{results.combinedFirstEightHoursRateMlh} mL/h</span>
+                    <span>Tasa de Infusión:</span>
+                    <span className="font-mono font-bold text-rose-600 text-sm">{results.firstEightHoursRateMlh} mL/h</span>
                   </div>
                 </div>
 
@@ -299,12 +372,8 @@ export default function BurnsModule() {
                     <span className="text-xs font-bold font-mono text-slate-800">{results.nextSixteenHoursMl} mL</span>
                   </div>
                   <div className="flex justify-between items-center text-xs text-slate-500">
-                    <span>Tasa de Resucitación:</span>
-                    <span className="font-mono font-semibold text-slate-700">{results.nextSixteenHoursRateMlh} mL/h</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs text-rose-600 font-medium mt-1 border-t border-dashed border-slate-200 pt-1">
-                    <span>+ Líquidos de Mantenimiento:</span>
-                    <span className="font-mono font-bold">{results.combinedNextSixteenHoursRateMlh} mL/h</span>
+                    <span>Tasa de Infusión:</span>
+                    <span className="font-mono font-bold text-rose-600 text-sm">{results.nextSixteenHoursRateMlh} mL/h</span>
                   </div>
                 </div>
               </div>
@@ -312,8 +381,12 @@ export default function BurnsModule() {
 
             <ClinicalAlert
               type="info"
-              title="Nota Pediátrica"
-              message="En pediatría se DEBE sumar la tasa de líquidos de mantenimiento (Holliday-Segar) a la tasa de resucitación de Parkland para evitar hipoglicemia y deshidratación basal."
+              title="Observación General"
+              message={
+                formula === 'Galveston'
+                  ? 'La fórmula de Galveston ya incluye los requerimientos de líquidos de mantenimiento dentro de su cálculo total.'
+                  : 'En los casos donde se utilice la fórmula "Parkland Modificada" en menores de 14 años y menos de 30 kg, los requerimientos de mantenimiento se agregan automáticamente en el resultado.'
+              }
             />
           </div>
         </div>

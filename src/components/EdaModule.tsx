@@ -15,6 +15,9 @@ export default function EdaModule() {
   // Direct Plan selection
   const [selectedPlan, setSelectedPlan] = useState<'A' | 'B' | 'C'>('A');
 
+  // Plan C Subtype selection
+  const [planCSubtype, setPlanCSubtype] = useState<'deshidratacion_grave' | 'shock_hipovolemico'>('deshidratacion_grave');
+
   // Assistant clinical signs state
   const [condition, setCondition] = useState<'alert' | 'irritable' | 'lethargic'>('alert');
   const [eyes, setEyes] = useState<'normal' | 'sunken'>('normal');
@@ -23,7 +26,7 @@ export default function EdaModule() {
 
   // Results
   const [severity, setSeverity] = useState<DehydrationSeverity>('none');
-  const [hydration, setHydration] = useState(calculateEdaHydration(weightKg, ageMonths, 'none'));
+  const [hydration, setHydration] = useState(calculateEdaHydration(weightKg, ageMonths, 'none', planCSubtype));
 
   // Show/Hide WHO reference guide
   const [showWhoGuide, setShowWhoGuide] = useState<boolean>(false);
@@ -42,12 +45,12 @@ export default function EdaModule() {
       };
       const currentSev = sevMap[selectedPlan];
       setSeverity(currentSev);
-      setHydration(calculateEdaHydration(weightKg, ageMonths, currentSev));
+      setHydration(calculateEdaHydration(weightKg, ageMonths, currentSev, planCSubtype));
     } else {
       const currentAssessment: EdaAssessment = { condition, eyes, thirst, skinPinch };
       const calculatedSeverity = assessDehydration(currentAssessment);
       setSeverity(calculatedSeverity);
-      setHydration(calculateEdaHydration(weightKg, ageMonths, calculatedSeverity));
+      setHydration(calculateEdaHydration(weightKg, ageMonths, calculatedSeverity, planCSubtype));
 
       // Sync the plan selector tab
       const planMap: Record<DehydrationSeverity, 'A' | 'B' | 'C'> = {
@@ -57,7 +60,7 @@ export default function EdaModule() {
       };
       setSelectedPlan(planMap[calculatedSeverity]);
     }
-  }, [weightKg, ageMonths, mode, selectedPlan, condition, eyes, thirst, skinPinch]);
+  }, [weightKg, ageMonths, mode, selectedPlan, condition, eyes, thirst, skinPinch, planCSubtype]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -66,6 +69,7 @@ export default function EdaModule() {
     const details = {
       method: 'Enfermedad Diarreica Aguda (EDA) - OMS',
       mode,
+      planCSubtype: selectedPlan === 'C' ? planCSubtype : null,
       assessment: mode === 'assistant' ? { condition, eyes, thirst, skinPinch } : null,
       results: {
         severity,
@@ -73,6 +77,9 @@ export default function EdaModule() {
         planDetails: hydration.planDetails,
         fluidVolumeMl: hydration.fluidVolumeMl,
         hourlyRates: hydration.hourlyRates,
+        zincDoseMg: hydration.zincDoseMg,
+        boloVolumeMlMin: hydration.boloVolumeMlMin,
+        boloVolumeMlMax: hydration.boloVolumeMlMax,
       },
     };
 
@@ -260,6 +267,33 @@ export default function EdaModule() {
                 </div>
               </div>
             )}
+
+            {/* Plan C Subtype Selection (Only shown if Plan C is active) */}
+            {selectedPlan === 'C' && (
+              <div className="bg-rose-50/50 border border-rose-100 rounded-2xl p-4 space-y-3 animate-fade-in">
+                <label className="block text-[10px] uppercase font-bold text-rose-800">Subtipo de Plan C</label>
+                <div className="flex bg-rose-100/30 p-1 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setPlanCSubtype('deshidratacion_grave')}
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                      planCSubtype === 'deshidratacion_grave' ? 'bg-white text-rose-900 shadow-sm' : 'text-rose-600 hover:text-rose-900'
+                    }`}
+                  >
+                    Deshidratación Grave
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPlanCSubtype('shock_hipovolemico')}
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                      planCSubtype === 'shock_hipovolemico' ? 'bg-white text-rose-900 shadow-sm' : 'text-rose-600 hover:text-rose-900'
+                    }`}
+                  >
+                    Shock Hipovolémico
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* WHO Reference Guide Accordion */}
@@ -312,12 +346,12 @@ export default function EdaModule() {
                 <h4 className="text-base font-bold mt-2.5 text-slate-900">
                   {hydration.recommendedPlan === 'A' && 'Tratamiento en el Hogar'}
                   {hydration.recommendedPlan === 'B' && 'Rehidratación Oral (SRO)'}
-                  {hydration.recommendedPlan === 'C' && 'Rehidratación Intravenosa Rápida'}
+                  {hydration.recommendedPlan === 'C' && (planCSubtype === 'shock_hipovolemico' ? 'Shock Hipovolémico' : 'Rehidratación Intravenosa Rápida')}
                 </h4>
                 <p className="text-xs text-slate-500 mt-1">
                   {hydration.recommendedPlan === 'A' && 'Sin signos suficientes de deshidratación.'}
                   {hydration.recommendedPlan === 'B' && 'Deshidratación moderada detectada.'}
-                  {hydration.recommendedPlan === 'C' && 'Deshidratación grave. ¡Emergencia médica!'}
+                  {hydration.recommendedPlan === 'C' && (planCSubtype === 'shock_hipovolemico' ? '¡EMERGENCIA! Shock hipovolémico detectado.' : 'Deshidratación grave. ¡Emergencia médica!')}
                 </p>
               </div>
             </div>
@@ -333,7 +367,7 @@ export default function EdaModule() {
               {hydration.fluidVolumeMl && (
                 <div className="border-t border-dashed border-slate-200 pt-3 mt-2 space-y-3">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold text-slate-700">Volumen Total Requerido:</span>
+                    <span className="font-bold text-slate-700">Volumen de Rehidratación Total:</span>
                     <span className="font-mono font-bold text-slate-900 text-sm">{hydration.fluidVolumeMl} mL</span>
                   </div>
                   {hydration.hourlyRates && (
@@ -358,11 +392,16 @@ export default function EdaModule() {
               )}
             </div>
 
+            {/* Emergency Alert for Plan C */}
             {hydration.recommendedPlan === 'C' && (
               <ClinicalAlert
                 type="critical"
                 title="Alerta de Emergencia Médica"
-                message="Deshidratación grave detectada. Inicie rehidratación intravenosa inmediata (Plan C). Si no hay acceso IV disponible, coloque sonda nasogástrica para SRO mientras se canaliza o se traslada al paciente."
+                message={
+                  planCSubtype === 'shock_hipovolemico'
+                    ? `Shock hipovolémico detectado. Administrar de inmediato un bolo de expansión de Ringer Lactato de ${weightKg * 20} a ${weightKg * 30} mL (20-30 mL/kg) y reevaluar pulso y estado de conciencia. Luego continuar con el esquema de infusión rápida.`
+                    : 'Deshidratación grave detectada. Inicie rehidratación intravenosa rápida (Plan C) de inmediato. Si no hay acceso IV disponible, coloque sonda nasogástrica para SRO mientras se canaliza o se traslada al paciente.'
+                }
               />
             )}
           </div>

@@ -3,19 +3,26 @@
  * All calculations are pure functions, strictly typed, and isolated for safety.
  */
 
-// --- 1. BODY SURFACE AREA (BSA) ---
+// --- 1. BODY SURFACE AREA (BSA / SCT) ---
 
 /**
- * Calculates Body Surface Area (BSA) using the Mosteller formula:
- * BSA = sqrt((Height (cm) * Weight (kg)) / 3600)
+ * Calculates Body Surface Area (BSA / SCT) using the weight-based formula:
+ * - If Weight < 10 kg: BSA = ((Weight * 4) + 9) / 100
+ * - If Weight >= 10 kg: BSA = ((Weight * 4) + 7) / (Weight + 90)
+ * Height (talla) is left as purely informative and does not affect the calculation.
  */
-export function calculateBSA(weightKg: number, heightCm: number): number {
-  if (weightKg <= 0 || heightCm <= 0) return 0;
-  const bsa = Math.sqrt((weightKg * heightCm) / 3600);
+export function calculateBSA(weightKg: number, heightCm?: number): number {
+  if (weightKg <= 0) return 0;
+  let bsa = 0;
+  if (weightKg < 10) {
+    bsa = ((weightKg * 4) + 9) / 100;
+  } else {
+    bsa = ((weightKg * 4) + 7) / (weightKg + 90);
+  }
   return parseFloat(bsa.toFixed(3));
 }
 
-// --- 2. MAINTENANCE FLUIDS & ELECTROLYTES ---
+// --- 2. MAINTENANCE FLUIDS ---
 
 export interface HollidaySegarResult {
   dailyVolumeMl: number;
@@ -28,7 +35,7 @@ export interface HollidaySegarResult {
  * Calculates maintenance fluids using the Holliday-Segar method:
  * - <= 10 kg: 100 mL/kg/day
  * - 10-20 kg: 1000 mL + 50 mL/kg/day for each kg > 10
- * - > 20 kg: 1500 mL + 20 mL/kg/day for each kg > 20
+ * - 20-30 kg: 1500 mL + 20 mL/kg/day for each kg > 20
  */
 export function calculateHollidaySegar(weightKg: number): HollidaySegarResult {
   if (weightKg <= 0) {
@@ -61,42 +68,36 @@ export function calculateHollidaySegar(weightKg: number): HollidaySegarResult {
 }
 
 export interface BsaMaintenanceResult {
-  dailyVolumeMl: number;
-  hourlyRateMlh: number;
-  naTotalMeq: number;
-  kTotalMeq: number;
+  dailyVolumeMlMin: number;
+  dailyVolumeMlMax: number;
+  hourlyRateMlhMin: number;
+  hourlyRateMlhMax: number;
 }
 
 /**
- * Calculates maintenance fluids and electrolytes based on Body Surface Area (BSA):
- * - Fluid requirement standard: 1200 - 1800 mL/m2/day (default 1500)
- * - Sodium (Na) requirement standard: 30 - 50 mEq/m2/day (default 40)
- * - Potassium (K) requirement standard: 20 - 40 mEq/m2/day (default 20)
+ * Calculates maintenance fluids based on Body Surface Area (BSA) for weight > 30 kg:
+ * - Rango Inferior: 1500 mL/m2/day
+ * - Rango Superior: 1800 mL/m2/day
  */
-export function calculateBsaMaintenance(
-  bsa: number,
-  fluidReqM2: number = 1500,
-  naReqM2: number = 40,
-  kReqM2: number = 20
-): BsaMaintenanceResult {
+export function calculateBsaMaintenance(bsa: number): BsaMaintenanceResult {
   if (bsa <= 0) {
-    return { dailyVolumeMl: 0, hourlyRateMlh: 0, naTotalMeq: 0, kTotalMeq: 0 };
+    return { dailyVolumeMlMin: 0, dailyVolumeMlMax: 0, hourlyRateMlhMin: 0, hourlyRateMlhMax: 0 };
   }
 
-  const dailyVolumeMl = bsa * fluidReqM2;
-  const hourlyRateMlh = dailyVolumeMl / 24;
-  const naTotalMeq = bsa * naReqM2;
-  const kTotalMeq = bsa * kReqM2;
+  const dailyVolumeMlMin = bsa * 1500;
+  const dailyVolumeMlMax = bsa * 1800;
+  const hourlyRateMlhMin = dailyVolumeMlMin / 24;
+  const hourlyRateMlhMax = dailyVolumeMlMax / 24;
 
   return {
-    dailyVolumeMl: Math.round(dailyVolumeMl),
-    hourlyRateMlh: parseFloat(hourlyRateMlh.toFixed(1)),
-    naTotalMeq: parseFloat(naTotalMeq.toFixed(1)),
-    kTotalMeq: parseFloat(kTotalMeq.toFixed(1)),
+    dailyVolumeMlMin: Math.round(dailyVolumeMlMin),
+    dailyVolumeMlMax: Math.round(dailyVolumeMlMax),
+    hourlyRateMlhMin: parseFloat(hourlyRateMlhMin.toFixed(1)),
+    hourlyRateMlhMax: parseFloat(hourlyRateMlhMax.toFixed(1)),
   };
 }
 
-// --- 3. BURNS (LUND-BROWDER & PARKLAND) ---
+// --- 3. BURNS (LUND-BROWDER, GALVESTON & PARKLAND MODIFICADO) ---
 
 export type AgeGroup = 'under_1' | '1_4' | '5_9' | '10_14' | '15' | 'adult';
 
@@ -122,9 +123,6 @@ export interface LundBrowderValues {
   lFoot: number;
 }
 
-/**
- * Lund-Browder body surface area percentages by age group
- */
 export const LUND_BROWDER_CHART: Record<AgeGroup, LundBrowderValues> = {
   under_1: {
     head: 19, neck: 2, antTrunk: 13, postTrunk: 13, rButtock: 2.5, lButtock: 2.5, genitalia: 1,
@@ -158,36 +156,46 @@ export const LUND_BROWDER_CHART: Record<AgeGroup, LundBrowderValues> = {
   }
 };
 
-export interface ParklandResult {
+export function getAgeGroup(ageMonths: number): AgeGroup {
+  if (ageMonths < 12) return 'under_1';
+  if (ageMonths < 60) return '1_4';
+  if (ageMonths < 120) return '5_9';
+  if (ageMonths < 180) return '10_14';
+  if (ageMonths < 192) return '15';
+  return 'adult';
+}
+
+export interface BurnsResult {
   totalVolumeMl: number;
   firstEightHoursMl: number;
   firstEightHoursRateMlh: number;
   nextSixteenHoursMl: number;
   nextSixteenHoursRateMlh: number;
-  maintenanceDailyVolumeMl: number;
-  maintenanceHourlyRateMlh: number;
-  combinedFirstEightHoursRateMlh: number;
-  combinedNextSixteenHoursRateMlh: number;
+  sctM2: number;
+  scqM2: number;
+  maintenanceAddedMl?: number;
 }
 
 /**
- * Determines age group based on age in months
+ * Calculates burn fluid resuscitation according to Galveston or Parkland Modificado formulas:
+ * - Galveston: (5000 * SCQ_m2) + (2000 * SCT_m2)
+ * - Parkland Modificado:
+ *   - Age >= 14 years (168 months): 2 * Weight * %SCQ
+ *   - Age < 14 years:
+ *     - Weight < 30 kg: (Constant * Weight * %SCQ) + Holliday-Segar
+ *     - Weight >= 30 kg: Constant * Weight * %SCQ
+ *   - Constant is 3.0 for Thermal burns, 4.0 for Inhalation burns.
  */
-export function getAgeGroup(ageMonths: number): AgeGroup {
-  if (ageMonths < 12) return 'under_1';
-  if (ageMonths < 60) return '1_4'; // 1-4 years (12 to 59 months)
-  if (ageMonths < 120) return '5_9'; // 5-9 years (60 to 119 months)
-  if (ageMonths < 180) return '10_14'; // 10-14 years (120 to 179 months)
-  if (ageMonths < 192) return '15'; // 15 years (180 to 191 months)
-  return 'adult'; // >= 16 years (192 months)
-}
+export function calculateBurns(
+  weightKg: number,
+  scqPercentage: number,
+  formula: 'Galveston' | 'Parkland',
+  ageMonths: number,
+  burnType: 'thermal' | 'inhalation' = 'thermal'
+): BurnsResult {
+  const sctM2 = calculateBSA(weightKg);
+  const scqM2 = sctM2 * (scqPercentage / 100);
 
-/**
- * Calculates burn fluid resuscitation using the Parkland formula:
- * Volume = 4 mL * Weight (kg) * %SCQ
- * plus Holliday-Segar maintenance fluids for pediatric patients.
- */
-export function calculateParkland(weightKg: number, scqPercentage: number): ParklandResult {
   if (weightKg <= 0 || scqPercentage <= 0) {
     return {
       totalVolumeMl: 0,
@@ -195,119 +203,144 @@ export function calculateParkland(weightKg: number, scqPercentage: number): Park
       firstEightHoursRateMlh: 0,
       nextSixteenHoursMl: 0,
       nextSixteenHoursRateMlh: 0,
-      maintenanceDailyVolumeMl: 0,
-      maintenanceHourlyRateMlh: 0,
-      combinedFirstEightHoursRateMlh: 0,
-      combinedNextSixteenHoursRateMlh: 0
+      sctM2,
+      scqM2: 0,
     };
   }
 
-  // Parkland Volume = 4 * weight * %SCQ
-  const totalVolumeMl = 4 * weightKg * scqPercentage;
-  const firstEightHoursMl = totalVolumeMl * 0.5;
-  const nextSixteenHoursMl = totalVolumeMl * 0.5;
+  let totalVolumeMl = 0;
+  let maintenanceAddedMl = 0;
 
-  const firstEightHoursRateMlh = firstEightHoursMl / 8;
-  const nextSixteenHoursRateMlh = nextSixteenHoursMl / 16;
+  if (formula === 'Galveston') {
+    totalVolumeMl = (5000 * scqM2) + (2000 * sctM2);
+  } else {
+    // Parkland Modificado
+    const ageYears = ageMonths / 12;
+    const constant = burnType === 'inhalation' ? 4.0 : 3.0;
 
-  // Pediatric patients require maintenance fluids as well
-  const maintenance = calculateHollidaySegar(weightKg);
-  const maintenanceDailyVolumeMl = maintenance.dailyVolumeMl;
-  const maintenanceHourlyRateMlh = maintenance.hourlyRateMlh;
+    if (ageYears >= 14) {
+      totalVolumeMl = 2 * weightKg * scqPercentage;
+    } else {
+      // Pediatric (Age < 14)
+      if (weightKg < 30) {
+        const maintenance = calculateHollidaySegar(weightKg);
+        maintenanceAddedMl = maintenance.dailyVolumeMl;
+        totalVolumeMl = (constant * weightKg * scqPercentage) + maintenanceAddedMl;
+      } else {
+        totalVolumeMl = constant * weightKg * scqPercentage;
+      }
+    }
+  }
 
-  const combinedFirstEightHoursRateMlh = firstEightHoursRateMlh + maintenanceHourlyRateMlh;
-  const combinedNextSixteenHoursRateMlh = nextSixteenHoursRateMlh + maintenanceHourlyRateMlh;
+  const firstEightHoursMl = totalVolumeMl / 2;
+  const nextSixteenHoursMl = totalVolumeMl / 2;
 
   return {
     totalVolumeMl: Math.round(totalVolumeMl),
     firstEightHoursMl: Math.round(firstEightHoursMl),
-    firstEightHoursRateMlh: parseFloat(firstEightHoursRateMlh.toFixed(1)),
+    firstEightHoursRateMlh: parseFloat((firstEightHoursMl / 8).toFixed(1)),
     nextSixteenHoursMl: Math.round(nextSixteenHoursMl),
-    nextSixteenHoursRateMlh: parseFloat(nextSixteenHoursRateMlh.toFixed(1)),
-    maintenanceDailyVolumeMl,
-    maintenanceHourlyRateMlh,
-    combinedFirstEightHoursRateMlh: parseFloat(combinedFirstEightHoursRateMlh.toFixed(1)),
-    combinedNextSixteenHoursRateMlh: parseFloat(combinedNextSixteenHoursRateMlh.toFixed(1))
+    nextSixteenHoursRateMlh: parseFloat((nextSixteenHoursMl / 16).toFixed(1)),
+    sctM2,
+    scqM2: parseFloat(scqM2.toFixed(3)),
+    maintenanceAddedMl: maintenanceAddedMl > 0 ? maintenanceAddedMl : undefined,
   };
 }
 
-// --- 4. DIABETIC KETOACIDOSIS (CAD) ---
+// --- 4. CETOACIDOSIS DIABÉTICA (CAD) ---
 
 export interface DkaResult {
-  correctedSodiumMeqL: number;
-  bolusVolumeMl: number;
-  insulinRateUiH: number;
-  dehydrationDeficitMl: number;
-  hourlyDeficitRateMlh: number;
-  maintenanceHourlyRateMlh: number;
-  totalHourlyFluidRateMlh: number;
+  bolus10VolumeMl: number;
+  bolus20VolumeMl: number;
+  dailyVolumeMlMin: number; // For weight > 30
+  dailyVolumeMlMax: number; // For weight > 30
+  hourlyRateMlhMin: number; // For weight > 30
+  hourlyRateMlhMax: number; // For weight > 30
+  totalVolumeMl48h?: number; // For weight <= 30
+  hourlyRateMlh48h?: number; // For weight <= 30
+  maintVolume24h?: number; // For weight <= 30
+  deficitVolumeMl?: number; // For weight <= 30
+  sctM2: number;
 }
 
 /**
- * Calculates corrected sodium based on glucose levels:
- * Corrected Na = Measured Na + 1.6 * ((Glucose - 100) / 100)
- */
-export function calculateCorrectedSodium(measuredNa: number, glucoseMgDl: number): number {
-  if (measuredNa <= 0 || glucoseMgDl <= 0) return 0;
-  if (glucoseMgDl <= 100) return measuredNa;
-  const correctedNa = measuredNa + 1.6 * ((glucoseMgDl - 100) / 100);
-  return parseFloat(correctedNa.toFixed(1));
-}
-
-/**
- * Calculates Diabetic Ketoacidosis (DKA) fluid and insulin management:
- * - Saline bolus: 10 - 20 mL/kg (default 10)
- * - Insulin rate: 0.05 - 0.1 UI/kg/h (default 0.1)
- * - Deficit correction: % Dehydration * Weight * 10, corrected over 48 hours.
+ * Calculates Cetoacidosis Diabética (CAD) fluid management based on Excel formulas:
+ * - Bolos: 10 mL/kg and 20 mL/kg (if conCompromiso is true)
+ * - If Weight <= 30 kg:
+ *   - Grado Deshidratación: Leve (50 mL/kg), Moderada (70 mL/kg), Grave (100 mL/kg)
+ *   - Total 48h = (Holliday-Segar * basalVeces) + (Grado * Peso)
+ *   - Hourly Rate = Total 48h / 48
+ * - If Weight > 30 kg:
+ *   - Rango Inferior 24h = 2500 * SCT
+ *   - Rango Superior 24h = 3000 * SCT
+ *   - Hourly Rate Inferior = Rango Inferior / 24
+ *   - Hourly Rate Superior = Rango Superior / 24
  */
 export function calculateDka(
   weightKg: number,
-  measuredNa: number,
-  glucoseMgDl: number,
-  dehydrationPercentage: number, // e.g. 5, 10, 15
-  bolusMlKg: number = 10,
-  insulinUiKgH: number = 0.1,
-  correctionHours: number = 48
+  severity: 'leve' | 'moderada' | 'grave',
+  conCompromiso: boolean,
+  basalVeces: number = 2.0
 ): DkaResult {
-  const correctedSodiumMeqL = calculateCorrectedSodium(measuredNa, glucoseMgDl);
-  
+  const sctM2 = calculateBSA(weightKg);
+  const bolus10VolumeMl = weightKg * 10;
+  const bolus20VolumeMl = weightKg * 20;
+
   if (weightKg <= 0) {
     return {
-      correctedSodiumMeqL,
-      bolusVolumeMl: 0,
-      insulinRateUiH: 0,
-      dehydrationDeficitMl: 0,
-      hourlyDeficitRateMlh: 0,
-      maintenanceHourlyRateMlh: 0,
-      totalHourlyFluidRateMlh: 0
+      bolus10VolumeMl: 0,
+      bolus20VolumeMl: 0,
+      dailyVolumeMlMin: 0,
+      dailyVolumeMlMax: 0,
+      hourlyRateMlhMin: 0,
+      hourlyRateMlhMax: 0,
+      sctM2,
     };
   }
 
-  const bolusVolumeMl = weightKg * bolusMlKg;
-  const insulinRateUiH = weightKg * insulinUiKgH;
-
-  // Deficit volume = % Dehydration * Weight * 10
-  const dehydrationDeficitMl = dehydrationPercentage * weightKg * 10;
-  
-  // Hourly deficit rate (subtracting bolus from deficit is standard to avoid volume overload)
-  const netDeficitMl = Math.max(0, dehydrationDeficitMl - bolusVolumeMl);
-  const hourlyDeficitRateMlh = netDeficitMl / correctionHours;
-
-  // Maintenance fluids (Holliday-Segar)
-  const maintenance = calculateHollidaySegar(weightKg);
-  const maintenanceHourlyRateMlh = maintenance.hourlyRateMlh;
-
-  const totalHourlyFluidRateMlh = hourlyDeficitRateMlh + maintenanceHourlyRateMlh;
-
-  return {
-    correctedSodiumMeqL,
-    bolusVolumeMl: Math.round(bolusVolumeMl),
-    insulinRateUiH: parseFloat(insulinRateUiH.toFixed(2)),
-    dehydrationDeficitMl: Math.round(dehydrationDeficitMl),
-    hourlyDeficitRateMlh: parseFloat(hourlyDeficitRateMlh.toFixed(1)),
-    maintenanceHourlyRateMlh,
-    totalHourlyFluidRateMlh: parseFloat(totalHourlyFluidRateMlh.toFixed(1))
+  const severityMlKg = {
+    leve: 50,
+    moderada: 70,
+    grave: 100,
   };
+  const gradoDeshidratacion = severityMlKg[severity];
+
+  if (weightKg <= 30) {
+    const maintVolume24h = calculateHollidaySegar(weightKg).dailyVolumeMl;
+    const deficitVolumeMl = gradoDeshidratacion * weightKg;
+    const totalVolumeMl48h = (maintVolume24h * basalVeces) + deficitVolumeMl;
+    const hourlyRateMlh48h = totalVolumeMl48h / 48;
+
+    return {
+      bolus10VolumeMl: Math.round(bolus10VolumeMl),
+      bolus20VolumeMl: Math.round(bolus20VolumeMl),
+      dailyVolumeMlMin: 0,
+      dailyVolumeMlMax: 0,
+      hourlyRateMlhMin: 0,
+      hourlyRateMlhMax: 0,
+      totalVolumeMl48h: Math.round(totalVolumeMl48h),
+      hourlyRateMlh48h: parseFloat(hourlyRateMlh48h.toFixed(1)),
+      maintVolume24h,
+      deficitVolumeMl,
+      sctM2,
+    };
+  } else {
+    // Weight > 30 kg
+    const dailyVolumeMlMin = 2500 * sctM2;
+    const dailyVolumeMlMax = 3000 * sctM2;
+    const hourlyRateMlhMin = dailyVolumeMlMin / 24;
+    const hourlyRateMlhMax = dailyVolumeMlMax / 24;
+
+    return {
+      bolus10VolumeMl: Math.round(bolus10VolumeMl),
+      bolus20VolumeMl: Math.round(bolus20VolumeMl),
+      dailyVolumeMlMin: Math.round(dailyVolumeMlMin),
+      dailyVolumeMlMax: Math.round(dailyVolumeMlMax),
+      hourlyRateMlhMin: parseFloat(hourlyRateMlhMin.toFixed(1)),
+      hourlyRateMlhMax: parseFloat(hourlyRateMlhMax.toFixed(1)),
+      sctM2,
+    };
+  }
 }
 
 // --- 5. ACUTE DIARRHEAL DISEASE (EDA) ---
@@ -332,6 +365,9 @@ export interface EdaResult {
     phase2RateMlh?: number;
     phase2DurationH?: number;
   };
+  zincDoseMg?: number;
+  boloVolumeMlMin?: number;
+  boloVolumeMlMax?: number;
 }
 
 /**
@@ -355,10 +391,6 @@ export function assessDehydration(assessment: EdaAssessment): DehydrationSeverit
   if (assessment.skinPinch === 'very_slow') severeSigns++;
   else if (assessment.skinPinch === 'slow') someSigns++;
 
-  // WHO rules:
-  // - 2 or more signs of severe dehydration, including at least 1 key sign (lethargic/unconscious, unable to drink, very slow skin pinch) -> Severe
-  // - 2 or more signs of some dehydration, including at least 1 key sign (irritable, thirsty, slow skin pinch) -> Some
-  // - Otherwise -> None
   if (severeSigns >= 2) return 'severe';
   if (someSigns >= 2) return 'some';
   return 'none';
@@ -366,11 +398,23 @@ export function assessDehydration(assessment: EdaAssessment): DehydrationSeverit
 
 /**
  * Calculates rehydration requirements based on WHO Plans A, B, and C
+ * - Plan A:
+ *   - Age < 2 years: 50-100 mL after each stool
+ *   - Age >= 2 years: 100-200 mL after each stool
+ * - Plan B:
+ *   - 25 mL/kg/h for 4 hours (Total 100 mL/kg)
+ * - Plan C:
+ *   - If conShock (Shock Hipovolémico): Bolo of 20-30 mL/kg, then Phase 1 and 2
+ *   - If Deshidratación Grave (no shock): No bolo, Phase 1 and 2
+ *   - Phase 1 and 2:
+ *     - < 1 year (ageMonths < 12): Phase 1 (30 mL/kg in 1h), Phase 2 (70 mL/kg in 5h)
+ *     - >= 1 year (ageMonths >= 12): Phase 1 (30 mL/kg in 30 min), Phase 2 (70 mL/kg in 2.5h)
  */
 export function calculateEdaHydration(
   weightKg: number,
   ageMonths: number,
-  severity: DehydrationSeverity
+  severity: DehydrationSeverity,
+  planCSubtype: 'deshidratacion_grave' | 'shock_hipovolemico' = 'deshidratacion_grave'
 ): EdaResult {
   if (weightKg <= 0) {
     return {
@@ -380,24 +424,29 @@ export function calculateEdaHydration(
     };
   }
 
+  const zincDoseMg = ageMonths < 6 ? 10 : 20;
+
   if (severity === 'none') {
-    const sroPerStool = ageMonths < 24 ? '50-100 mL' : '100-200 mL';
+    const ageYears = ageMonths / 12;
+    const sroPerStool = ageYears < 2 ? '50 a 100 mL' : '100 a 200 mL';
     return {
       severity,
       recommendedPlan: 'A',
-      planDetails: `Plan A (Tratamiento en el hogar): Dar sales de rehidratación oral (SRO) después de cada evacuación líquida: ${sroPerStool}. Continuar lactancia materna y alimentación habitual.`
+      zincDoseMg,
+      planDetails: `Plan A (Tratamiento en el hogar): Dar sales de rehidratación oral (SRO) después de cada evacuación líquida: ${sroPerStool}. Continuar lactancia materna y alimentación habitual. Administrar Sulfato de Zinc (${zincDoseMg} mg al día) por 14 días.`
     };
   }
 
   if (severity === 'some') {
-    // Plan B: 75 mL/kg over 4 hours
-    const fluidVolumeMl = weightKg * 75;
-    const hourlyRate = fluidVolumeMl / 4;
+    // Plan B: 25 cc/kg/h over 4 hours (Total 100 mL/kg)
+    const hourlyRate = weightKg * 25;
+    const fluidVolumeMl = hourlyRate * 4;
     return {
       severity,
       recommendedPlan: 'B',
       fluidVolumeMl: Math.round(fluidVolumeMl),
-      planDetails: `Plan B (Rehidratación oral en sala de urgencias): Administrar ${Math.round(fluidVolumeMl)} mL de SRO en 4 horas (${Math.round(hourlyRate)} mL/h). Evaluar continuamente. Si tolera y mejora, pasar a Plan A.`,
+      zincDoseMg,
+      planDetails: `Plan B (Rehidratación oral en sala de urgencias): Administrar ${Math.round(hourlyRate)} mL de SRO cada hora durante 4 horas (Volumen total: ${Math.round(fluidVolumeMl)} mL). Evaluar continuamente. Si tolera y mejora, pasar a Plan A. Administrar Sulfato de Zinc (${zincDoseMg} mg al día) por 14 días.`,
       hourlyRates: {
         phase1RateMlh: parseFloat(hourlyRate.toFixed(1)),
         phase1DurationH: 4
@@ -406,20 +455,32 @@ export function calculateEdaHydration(
   }
 
   // Plan C: 100 mL/kg IV (Ringer Lactato o Solución Salina 0.9%)
-  // Infants < 12 months: 30 mL/kg in 1h, then 70 mL/kg in 5h (Total 6h)
-  // Children >= 12 months: 30 mL/kg in 30 min, then 70 mL/kg in 2.5h (Total 3h)
   const totalVolumeMl = weightKg * 100;
   const phase1VolumeMl = weightKg * 30;
   const phase2VolumeMl = weightKg * 70;
+  const isUnder1 = ageMonths < 12;
 
-  if (ageMonths < 12) {
+  let boloDetails = '';
+  let boloVolumeMlMin = undefined;
+  let boloVolumeMlMax = undefined;
+
+  if (planCSubtype === 'shock_hipovolemico') {
+    boloVolumeMlMin = weightKg * 20;
+    boloVolumeMlMax = weightKg * 30;
+    boloDetails = `¡EMERGENCIA! Administrar Bolo inmediato de Ringer Lactato o Solución Salina 0.9% a ${boloVolumeMlMin}-${boloVolumeMlMax} mL (${weightKg * 20} a ${weightKg * 30} mL). `;
+  }
+
+  if (isUnder1) {
     const phase1RateMlh = phase1VolumeMl / 1; // 30 mL/kg over 1 hour
     const phase2RateMlh = phase2VolumeMl / 5; // 70 mL/kg over 5 hours
     return {
       severity,
       recommendedPlan: 'C',
       fluidVolumeMl: Math.round(totalVolumeMl),
-      planDetails: `Plan C (Rehidratación intravenosa rápida para deshidratación grave en lactantes < 12 meses): Administrar un total de ${Math.round(totalVolumeMl)} mL IV. Fase 1: ${Math.round(phase1VolumeMl)} mL en 1 hora (${Math.round(phase1RateMlh)} mL/h). Fase 2: ${Math.round(phase2VolumeMl)} mL en 5 horas (${Math.round(phase2RateMlh)} mL/h). Evaluar pulso radial cada 15-30 min.`,
+      zincDoseMg,
+      boloVolumeMlMin,
+      boloVolumeMlMax,
+      planDetails: `Plan C (${planCSubtype === 'shock_hipovolemico' ? 'Shock Hipovolémico' : 'Deshidratación Grave'} en lactantes < 12 meses): ${boloDetails}Disponer rehidratación IV de ${Math.round(totalVolumeMl)} mL en total. Fase 1: ${Math.round(phase1VolumeMl)} mL en 1 hora (${Math.round(phase1RateMlh)} mL/h). Fase 2: ${Math.round(phase2VolumeMl)} mL en 5 horas (${Math.round(phase2RateMlh)} mL/h). Reevaluar constantemente. Administrar Sulfato de Zinc (${zincDoseMg} mg al día) por 14 días.`,
       hourlyRates: {
         phase1RateMlh: parseFloat(phase1RateMlh.toFixed(1)),
         phase1DurationH: 1,
@@ -434,7 +495,10 @@ export function calculateEdaHydration(
       severity,
       recommendedPlan: 'C',
       fluidVolumeMl: Math.round(totalVolumeMl),
-      planDetails: `Plan C (Rehidratación intravenosa rápida para deshidratación grave en niños >= 12 meses): Administrar un total de ${Math.round(totalVolumeMl)} mL IV. Fase 1: ${Math.round(phase1VolumeMl)} mL en 30 minutos (${Math.round(phase1RateMlh)} mL/h). Fase 2: ${Math.round(phase2VolumeMl)} mL en 2.5 horas (${Math.round(phase2RateMlh)} mL/h). Evaluar pulso radial cada 15-30 min.`,
+      zincDoseMg,
+      boloVolumeMlMin,
+      boloVolumeMlMax,
+      planDetails: `Plan C (${planCSubtype === 'shock_hipovolemico' ? 'Shock Hipovolémico' : 'Deshidratación Grave'} en niños >= 12 meses): ${boloDetails}Disponer rehidratación IV de ${Math.round(totalVolumeMl)} mL en total. Fase 1: ${Math.round(phase1VolumeMl)} mL en 30 minutos (${Math.round(phase1RateMlh)} mL/h). Fase 2: ${Math.round(phase2VolumeMl)} mL en 2.5 horas (${Math.round(phase2RateMlh)} mL/h). Reevaluar constantemente. Administrar Sulfato de Zinc (${zincDoseMg} mg al día) por 14 días.`,
       hourlyRates: {
         phase1RateMlh: parseFloat(phase1RateMlh.toFixed(1)),
         phase1DurationH: 0.5,

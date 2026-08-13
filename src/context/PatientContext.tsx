@@ -78,11 +78,11 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // Calculate BSA automatically whenever weight or height changes
+  // Calculate BSA automatically whenever weight changes (height is purely informative)
   useEffect(() => {
-    const calculatedBsa = calculateBSA(weightKg, heightCm);
+    const calculatedBsa = calculateBSA(weightKg);
     setBsa(calculatedBsa);
-  }, [weightKg, heightCm]);
+  }, [weightKg]);
 
   // Fetch consultations history
   const refreshHistory = useCallback(async () => {
