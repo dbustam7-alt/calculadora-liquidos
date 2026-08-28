@@ -18,7 +18,7 @@ body {
   color: var(--foreground);
 }
 
-/* Custom PediatriCode Animations */
+/* Custom PediaCode Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;

@@ -49,7 +49,7 @@ export default function InfoModule() {
             <div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Sustento Científico y Referencias Clínicas</h3>
               <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                Para cumplir con las estrictas directrices de revisión de aplicaciones médicas de Apple (App Store Review Guidelines - Section 1.4.1 / 1.4.5) y Google Play, a continuación se detallan las fuentes bibliográficas, consensos internacionales y guías de práctica clínica oficiales en las que se basan los algoritmos de cálculo de <strong className="text-slate-800 dark:text-slate-200">PediatriCode</strong>:
+                Para cumplir con las estrictas directrices de revisión de aplicaciones médicas de Apple (App Store Review Guidelines - Section 1.4.1 / 1.4.5) y Google Play, a continuación se detallan las fuentes bibliográficas, consensos internacionales y guías de práctica clínica oficiales en las que se basan los algoritmos de cálculo de <strong className="text-slate-800 dark:text-slate-200">PediaCode</strong>:
               </p>
             </div>
 
@@ -145,7 +145,7 @@ export default function InfoModule() {
               </h4>
               <div className="space-y-2 text-xs md:text-sm text-rose-900 dark:text-rose-200 leading-relaxed font-medium">
                 <p>
-                  • <strong className="text-rose-950 dark:text-rose-100">Herramienta de Apoyo Únicamente:</strong> PediatriCode ha sido diseñada exclusivamente como una herramienta de apoyo digital y un asistente de cálculo matemático para profesionales de la salud (médicos pediatras, médicos generales, residentes, internos y personal de enfermería).
+                  • <strong className="text-rose-950 dark:text-rose-100">Herramienta de Apoyo Únicamente:</strong> PediaCode ha sido diseñada exclusivamente como una herramienta de apoyo digital y un asistente de cálculo matemático para profesionales de la salud (médicos pediatras, médicos generales, residentes, internos y personal de enfermería).
                 </p>
                 <p>
                   • <strong className="text-rose-950 dark:text-rose-100">Responsabilidad del Profesional:</strong> El cálculo de líquidos, tasas de infusión, bolos de rehidratación y esquemas de resucitación es una tarea de alta complejidad y riesgo clínico. La decisión terapéutica final, la verificación de las dosis y la programación de los equipos de infusión son responsabilidad exclusiva y absoluta del profesional de la salud a cargo del paciente.
@@ -159,11 +159,11 @@ export default function InfoModule() {
             <div className="space-y-4 text-xs md:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               <h4 className="font-bold text-slate-800 dark:text-slate-200">Limitación de Responsabilidad</h4>
               <p>
-                En la máxima medida permitida por la ley aplicable, el desarrollador de PediatriCode, sus afiliados, socios o licenciantes no serán responsables bajo ninguna circunstancia por cualquier error matemático, omisión, retraso o imprecisión en los cálculos generados por la Aplicación, ni por complicaciones médicas, lesiones corporales o mala práctica médica. La Aplicación se proporciona "tal cual" (As-Is) y sin garantías de ningún tipo.
+                En la máxima medida permitida por la ley aplicable, el desarrollador de PediaCode, sus afiliados, socios o licenciantes no serán responsables bajo ninguna circunstancia por cualquier error matemático, omisión, retraso o imprecisión en los cálculos generados por la Aplicación, ni por complicaciones médicas, lesiones corporales o mala práctica médica. La Aplicación se proporciona "tal cual" (As-Is) y sin garantías de ningún tipo.
               </p>
               <h4 className="font-bold text-slate-800 dark:text-slate-200">Propiedad Intelectual</h4>
               <p>
-                Todos los derechos de propiedad intelectual sobre el diseño, código fuente, algoritmos, logotipos, marcas y contenidos de PediatriCode pertenecen exclusivamente al desarrollador de la Aplicación. Queda estrictamente prohibida la reproducción, ingeniería inversa, descompilación o distribución no autorizada de la misma.
+                Todos los derechos de propiedad intelectual sobre el diseño, código fuente, algoritmos, logotipos, marcas y contenidos de PediaCode pertenecen exclusivamente al desarrollador de la Aplicación. Queda estrictamente prohibida la reproducción, ingeniería inversa, descompilación o distribución no autorizada de la misma.
               </p>
             </div>
           </div>
@@ -196,7 +196,7 @@ export default function InfoModule() {
               <div className="bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800 rounded-xl p-4 space-y-2">
                 <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">3. Permisos del Dispositivo</h4>
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  La versión móvil de PediatriCode está diseñada para funcionar de forma 100% offline (sin conexión a internet). No requiere permisos de geolocalización, acceso a la cámara, contactos, micrófono ni almacenamiento externo. No se utilizan SDKs de seguimiento ni analíticas invasivas.
+                  La versión móvil de PediaCode está diseñada para funcionar de forma 100% offline (sin conexión a internet). No requiere permisos de geolocalización, acceso a la cámara, contactos, micrófono ni almacenamiento externo. No se utilizan SDKs de seguimiento ni analíticas invasivas.
                 </p>
               </div>
 
@@ -239,9 +239,9 @@ export default function InfoModule() {
             </div>
 
             <div className="space-y-3">
-              <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">Acerca de PediatriCode</h4>
+              <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">Acerca de PediaCode</h4>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                PediatriCode es una aplicación móvil de soporte de decisiones clínicas diseñada específicamente para médicos pediatras, de urgencias, residentes y personal de enfermería. Nuestro objetivo es automatizar cálculos complejos de líquidos y electrólitos en situaciones de alta presión, reduciendo el margen de error y optimizando los tiempos de respuesta en urgencias pediátricas.
+                PediaCode es una aplicación móvil de soporte de decisiones clínicas diseñada específicamente para médicos pediatras, de urgencias, residentes y personal de enfermería. Nuestro objetivo es automatizar cálculos complejos de líquidos y electrólitos en situaciones de alta presión, reduciendo el margen de error y optimizando los tiempos de respuesta en urgencias pediátricas.
               </p>
             </div>
           </div>

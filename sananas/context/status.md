@@ -1,9 +1,9 @@
-# Project Status: PediatriCode - Urgencias Pediátricas
+# Project Status: PediaCode - Urgencias Pediátricas
 
 This document provides a granular overview of the current development status.
 
 ## Focus
-All core development phases are completed. The application has been expanded from a liquids calculator to a general pediatric emergency suite ("PediatriCode") with a beautiful Dashboard Hub, ready to scale with future modules.
+All core development phases are completed. The application has been expanded from a liquids calculator to a general pediatric emergency suite ("PediaCode") with a beautiful Dashboard Hub, ready to scale with future modules.
 
 ### Infra Stack
 - **Framework**: Next.js 15+ (App Router) + TypeScript + Bun

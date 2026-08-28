@@ -1,5 +1,5 @@
 /**
- * PediatriCode - Pure Clinical Formulas for Pediatric Emergency Calculator
+ * PediaCode - Pure Clinical Formulas for Pediatric Emergency Calculator
  * All calculations are pure functions, strictly typed, and isolated for safety.
  */
 

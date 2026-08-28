@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'PediatriCode - Calculadora Pediátrica de Urgencias',
+  title: 'PediaCode - Calculadora Pediátrica de Urgencias',
   description: 'Calculadora clínica de líquidos y electrólitos para urgencias pediátricas. Holliday-Segar, Parkland, CAD y Planes de la OMS.',
 };
 

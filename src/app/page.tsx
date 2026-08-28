@@ -69,7 +69,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-4 text-center text-[10px] md:text-xs text-slate-400 dark:text-slate-500 font-medium transition-colors">
         <div className="max-w-7xl mx-auto px-4">
-          <p>© {new Date().getFullYear()} PediatriCode. Diseñado para soporte clínico de alta velocidad en urgencias pediátricas.</p>
+          <p>© {new Date().getFullYear()} PediaCode. Diseñado para soporte clínico de alta velocidad en urgencias pediátricas.</p>
           <p className="mt-1 text-slate-400 dark:text-slate-500">
             Aviso de Seguridad: Esta herramienta es un asistente de cálculo clínico para profesionales de la salud. Verifique siempre las dosis y tasas de infusión antes de la administración.
           </p>

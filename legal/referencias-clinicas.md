@@ -1,6 +1,6 @@
-# Sustento Científico y Referencias Clínicas - PediatriCode
+# Sustento Científico y Referencias Clínicas - PediaCode
 
-Para cumplir con las estrictas directrices de revisión de aplicaciones médicas de Apple (App Store Review Guidelines - Section 1.4.1 / 1.4.5) y Google Play, a continuación se detallan las fuentes bibliográficas, consensos internacionales y guías de práctica clínica oficiales en las que se basan los algoritmos de cálculo de **PediatriCode**:
+Para cumplir con las estrictas directrices de revisión de aplicaciones médicas de Apple (App Store Review Guidelines - Section 1.4.1 / 1.4.5) y Google Play, a continuación se detallan las fuentes bibliográficas, consensos internacionales y guías de práctica clínica oficiales en las que se basan los algoritmos de cálculo de **PediaCode**:
 
 ---
 

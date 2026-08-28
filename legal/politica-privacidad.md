@@ -1,13 +1,13 @@
-# Política de Privacidad - PediatriCode
+# Política de Privacidad - PediaCode
 
 **Última actualización:** 27 de agosto de 2026
 
-Bienvenido a **PediatriCode** (en adelante, "la Aplicación"). Nos tomamos muy en serio la privacidad de nuestros usuarios y la seguridad de los datos. Esta Política de Privacidad describe cómo se maneja la información dentro de la Aplicación móvil y el sitio web.
+Bienvenido a **PediaCode** (en adelante, "la Aplicación"). Nos tomamos muy en serio la privacidad de nuestros usuarios y la seguridad de los datos. Esta Política de Privacidad describe cómo se maneja la información dentro de la Aplicación móvil y el sitio web.
 
 ---
 
 ### 1. Resumen de Privacidad (Cero Recolección de Datos)
-La premisa fundamental de PediatriCode es la **privacidad por diseño**. 
+La premisa fundamental de PediaCode es la **privacidad por diseño**. 
 *   **No recopilamos, no almacenamos, no rastreamos ni compartimos ningún tipo de información personal identificable (PII)** de los usuarios ni de los pacientes evaluados.
 *   **No recopilamos información de salud protegida (PHI)**. La aplicación no solicita nombres reales de pacientes, números de identificación gubernamentales ni registros médicos que puedan asociar un cálculo clínico con una persona física.
 
@@ -21,7 +21,7 @@ Todos los datos ingresados en la Aplicación (como el peso, la edad, la talla o 
 ---
 
 ### 3. Permisos del Dispositivo
-La versión móvil de PediatriCode está diseñada para funcionar de forma **100% offline** (sin conexión a internet). 
+La versión móvil de PediaCode está diseñada para funcionar de forma **100% offline** (sin conexión a internet). 
 *   No requiere permisos de geolocalización, acceso a la cámara, contactos, micrófono ni almacenamiento externo para realizar sus funciones de cálculo clínico.
 *   No se utilizan SDKs de seguimiento, analíticas invasivas ni redes de publicidad de terceros que puedan rastrear su comportamiento.
 

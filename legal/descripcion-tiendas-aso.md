@@ -1,6 +1,6 @@
-# Optimización de Tiendas (ASO) - PediatriCode
+# Optimización de Tiendas (ASO) - PediaCode
 
-Este documento contiene los textos optimizados para el lanzamiento de **PediatriCode** en la Apple App Store y Google Play Store. Está estructurado para cumplir con los límites de caracteres de ambas plataformas y maximizar la visibilidad orgánica (SEO/ASO) en búsquedas médicas en español.
+Este documento contiene los textos optimizados para el lanzamiento de **PediaCode** en la Apple App Store y Google Play Store. Está estructurado para cumplir con los límites de caracteres de ambas plataformas y maximizar la visibilidad orgánica (SEO/ASO) en búsquedas médicas en español.
 
 ---
 
@@ -8,8 +8,8 @@ Este documento contiene los textos optimizados para el lanzamiento de **Pediatri
 
 ### Título de la App (App Title)
 *   **Límite:** 30 caracteres
-*   **Propuesta:** `PediatriCode` (12 caracteres)
-*   **Propuesta ASO (Recomendada):** `PediatriCode: Líquidos Ped` (28 caracteres)
+*   **Propuesta:** `PediaCode` (12 caracteres)
+*   **Propuesta ASO (Recomendada):** `PediaCode: Líquidos Ped` (28 caracteres)
 
 ### Subtítulo (Subtitle)
 *   **Límite:** 30 caracteres
@@ -27,7 +27,7 @@ Este documento contiene los textos optimizados para el lanzamiento de **Pediatri
 *   **Límite:** 4000 caracteres
 *   **Propuesta:**
 ```text
-PediatriCode es el asistente digital definitivo para el cálculo ultra-rápido y preciso de líquidos, electrólitos y esquemas de resucitación en urgencias pediátricas. Diseñada por y para profesionales de la salud (pediatras, médicos generales, residentes, internos y enfermeros), esta herramienta optimiza la toma de decisiones clínicas en situaciones de alta presión.
+PediaCode es el asistente digital definitivo para el cálculo ultra-rápido y preciso de líquidos, electrólitos y esquemas de resucitación en urgencias pediátricas. Diseñada por y para profesionales de la salud (pediatras, médicos generales, residentes, internos y enfermeros), esta herramienta optimiza la toma de decisiones clínicas en situaciones de alta presión.
 
 ¿POR QUÉ ELEGIR PEDIATRICODE?
 • 100% OFFLINE: Funciona sin conexión a internet. Ideal para sótanos de hospitales, guardias médicas o zonas rurales sin señal.
@@ -76,7 +76,7 @@ AVISO LEGAL: Esta aplicación es una herramienta de apoyo y un asistente matemá
 
 ### Nombre de la App (App Name)
 *   **Límite:** 30 caracteres
-*   **Propuesta:** `PediatriCode: Líquidos Ped` (28 caracteres)
+*   **Propuesta:** `PediaCode: Líquidos Ped` (28 caracteres)
 
 ### Descripción Corta (Short Description)
 *   **Límite:** 80 caracteres
