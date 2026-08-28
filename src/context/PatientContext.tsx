@@ -15,6 +15,7 @@ interface PatientState {
   isLoadingHistory: boolean;
   user: SupabaseUser | null;
   isAuthLoading: boolean;
+  darkMode: boolean;
 }
 
 interface PatientContextType extends PatientState {
@@ -29,6 +30,7 @@ interface PatientContextType extends PatientState {
   deleteConsultation: (id: string) => Promise<boolean>;
   refreshHistory: () => Promise<void>;
   signOut: () => Promise<void>;
+  toggleDarkMode: () => void;
 }
 
 const PatientContext = createContext<PatientContextType | undefined>(undefined);
@@ -50,6 +52,35 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
   // Auth state
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+
+  // Theme / Dark Mode state
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+
+  // Load initial theme from localStorage or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialDark = savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
+    setDarkMode(initialDark);
+    if (initialDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => {
+      const next = !prev;
+      localStorage.setItem('theme', next ? 'dark' : 'light');
+      if (next) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      return next;
+    });
+  };
 
   // Listen to Auth changes
   useEffect(() => {
@@ -166,6 +197,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
         isLoadingHistory,
         user,
         isAuthLoading,
+        darkMode,
         setAgeMonths,
         setWeightKg,
         setHeightCm,
@@ -174,6 +206,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
         deleteConsultation,
         refreshHistory,
         signOut,
+        toggleDarkMode,
       }}
     >
       {children}
