@@ -36,8 +36,9 @@ All core development phases are completed. The application is ready for deployme
 - [x] Implement Supabase Authentication (Sign up / Sign in) with email confirmation.
 - [x] Add Google OAuth sign-in option.
 - [x] Add clinical registration form to collect professional details (Full Name, Specialty, Hospital, Medical License).
+- [x] Implement Native Dark Mode with persistent theme selection and high-contrast styling.
+- [x] Implement Interactive Burn Selector (Lund-Browder) with clickable SVG body diagrams (Anterior/Posterior).
 - [x] Verify production build and compilation.
 
 ### To Do Immediately
-- Push the latest authentication and registration updates to GitHub.
-- Ensure Vercel automatically deploys the latest main branch.
+- Verify that Vercel automatically deploys the latest main branch with dark mode and Lund-Browder selector.

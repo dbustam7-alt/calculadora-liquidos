@@ -29,3 +29,8 @@
 - [x] Registro expandido con datos profesionales (Nombre, Especialidad, Hospital, Registro Médico).
 - [x] Integración de Inicio de Sesión con Google (Google OAuth).
 - [x] Vinculación a repositorio en GitHub y despliegue continuo en Vercel (Listo para producción).
+
+## Phase 6: Monetization & Premium Features
+- [x] Implementación de Modo Oscuro Nativo con persistencia local y toggle en Header.
+- [x] Implementación de Selector Interactivo de Quemaduras (Lund-Browder) con diagramas corporales SVG interactivos.
+- [ ] Configuración e integración de Capacitor para compilación nativa en iOS y Android (en rama de desarrollo).
