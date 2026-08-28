@@ -13,7 +13,8 @@ import AuthScreen from '@/components/AuthScreen';
 export default function Home() {
   const { activeTab, user, isAuthLoading } = usePatient();
 
-  // Show loading spinner while checking auth session
+  // Mobile App Branch: Auth check bypassed to allow instant access without login
+  /*
   if (isAuthLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
@@ -23,10 +24,10 @@ export default function Home() {
     );
   }
 
-  // If user is not authenticated, render the Auth Screen
   if (!user) {
     return <AuthScreen />;
   }
+  */
 
   const renderActiveModule = () => {
     switch (activeTab) {
