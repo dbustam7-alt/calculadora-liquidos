@@ -2,20 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePatient } from '@/context/PatientContext';
-import { User, Calendar, Weight, Ruler, Activity, Droplets, Flame, Syringe, Stethoscope, Clock, LogOut } from 'lucide-react';
+import { Calendar, Weight, Ruler, Activity, Droplets, Flame, Syringe, Stethoscope, Clock, LogOut } from 'lucide-react';
 import ClinicalAlert from './ClinicalAlert';
 import { clsx } from 'clsx';
 
 export default function PatientHeader() {
   const {
-    name,
     ageMonths,
     weightKg,
     heightCm,
     bsa,
     activeTab,
     user,
-    setName,
     setAgeMonths,
     setWeightKg,
     setHeightCm,
@@ -83,22 +81,7 @@ export default function PatientHeader() {
           </div>
 
           {/* Patient Inputs Grid */}
-          <div className="lg:col-span-9 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-            {/* Patient Name */}
-            <div className="relative">
-              <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">Nombre del Paciente</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Paciente Anónimo"
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 focus:border-sky-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-100 transition-all font-medium text-slate-900"
-                />
-              </div>
-            </div>
-
+          <div className="lg:col-span-9 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             {/* Patient Age (Months & Years) */}
             <div>
               <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">Edad</label>

@@ -25,8 +25,9 @@ export default function ConsultationsHistory() {
 
   // Filter history based on search term and date
   const filteredHistory = history.filter((c) => {
+    const label = getModuleLabel(c.consultation_type);
     const matchesSearch =
-      c.patient_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      label.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.consultation_type.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesDate = dateFilter ? c.created_at.startsWith(dateFilter) : true;
@@ -134,11 +135,11 @@ export default function ConsultationsHistory() {
                     </div>
                     <div className="min-w-0">
                       <h4 className="font-bold text-slate-900 text-sm md:text-base truncate">
-                        {c.patient_name}
+                        Cálculo de {getModuleLabel(c.consultation_type)}
                       </h4>
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 font-medium mt-0.5">
                         <span className="font-semibold text-sky-700 bg-sky-50 border border-sky-100/50 px-1.5 py-0.5 rounded-md">
-                          {getModuleLabel(c.consultation_type)}
+                          {formatDate(c.created_at)}
                         </span>
                         <span>•</span>
                         <span>{c.weight_kg} kg</span>
