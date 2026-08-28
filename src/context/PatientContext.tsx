@@ -6,7 +6,6 @@ import { getConsultations, saveConsultation, PatientConsultation, deleteConsulta
 import { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface PatientState {
-  name: string;
   ageMonths: number;
   weightKg: number;
   heightCm: number;
@@ -19,7 +18,6 @@ interface PatientState {
 }
 
 interface PatientContextType extends PatientState {
-  setName: (name: string) => void;
   setAgeMonths: (months: number) => void;
   setWeightKg: (weight: number) => void;
   setHeightCm: (height: number) => void;
@@ -37,7 +35,6 @@ const PatientContext = createContext<PatientContextType | undefined>(undefined);
 
 export function PatientProvider({ children }: { children: React.ReactNode }) {
   // Patient basic details
-  const [name, setName] = useState<string>('');
   const [ageMonths, setAgeMonths] = useState<number>(12); // Default 1 year
   const [weightKg, setWeightKg] = useState<number>(10); // Default 10 kg
   const [heightCm, setHeightCm] = useState<number>(75); // Default 75 cm
@@ -112,7 +109,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
   ): Promise<boolean> => {
     try {
       const { data, error } = await saveConsultation({
-        patient_name: name.trim() || 'Paciente Anónimo',
+        patient_name: 'Consulta',
         age_months: ageMonths,
         weight_kg: weightKg,
         talla_cm: heightCm,
@@ -160,7 +157,6 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
   return (
     <PatientContext.Provider
       value={{
-        name,
         ageMonths,
         weightKg,
         heightCm,
@@ -170,7 +166,6 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
         isLoadingHistory,
         user,
         isAuthLoading,
-        setName,
         setAgeMonths,
         setWeightKg,
         setHeightCm,
