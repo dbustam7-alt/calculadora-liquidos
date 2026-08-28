@@ -33,4 +33,5 @@
 ## Phase 6: Monetization & Premium Features
 - [x] Implementación de Modo Oscuro Nativo con persistencia local y toggle en Header.
 - [x] Implementación de Selector Interactivo de Quemaduras (Lund-Browder) con diagramas corporales SVG interactivos.
+- [x] Implementación del Dashboard Hub (Menú Principal) para expansión modular de urgencias pediátricas.
 - [ ] Configuración e integración de Capacitor para compilación nativa en iOS y Android (en rama de desarrollo).
