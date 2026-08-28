@@ -8,6 +8,8 @@ import BurnsModule from '@/components/BurnsModule';
 import DkaModule from '@/components/DkaModule';
 import EdaModule from '@/components/EdaModule';
 import ConsultationsHistory from '@/components/ConsultationsHistory';
+import InfoModule from '@/components/InfoModule';
+import Dashboard from '@/components/Dashboard';
 import AuthScreen from '@/components/AuthScreen';
 
 export default function Home() {
@@ -28,6 +30,11 @@ export default function Home() {
     return <AuthScreen />;
   }
 
+  // If active tab is dashboard, render the main menu hub
+  if (activeTab === 'dashboard') {
+    return <Dashboard />;
+  }
+
   const renderActiveModule = () => {
     switch (activeTab) {
       case 'mantenimiento':
@@ -40,6 +47,8 @@ export default function Home() {
         return <EdaModule />;
       case 'historial':
         return <ConsultationsHistory />;
+      case 'info':
+        return <InfoModule />;
       default:
         return <MaintenanceModule />;
     }

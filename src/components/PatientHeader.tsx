@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePatient } from '@/context/PatientContext';
-import { Calendar, Weight, Ruler, Activity, Droplets, Flame, Syringe, Stethoscope, Clock, LogOut, Sun, Moon } from 'lucide-react';
+import { Calendar, Weight, Ruler, Activity, Droplets, Flame, Syringe, Stethoscope, Clock, LogOut, Sun, Moon, HelpCircle, ArrowLeft } from 'lucide-react';
 import ClinicalAlert from './ClinicalAlert';
 import { clsx } from 'clsx';
 
@@ -51,6 +51,7 @@ export default function PatientHeader() {
     { id: 'cad', label: 'CAD / DKA', icon: <Syringe className="h-4 w-4" /> },
     { id: 'eda', label: 'EDA / OMS', icon: <Stethoscope className="h-4 w-4" /> },
     { id: 'historial', label: 'Historial', icon: <Clock className="h-4 w-4" /> },
+    { id: 'info', label: 'Información', icon: <HelpCircle className="h-4 w-4" /> },
   ] as const;
 
   return (
@@ -61,6 +62,13 @@ export default function PatientHeader() {
           {/* Brand Logo / Title & User Info */}
           <div className="lg:col-span-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className="mr-1 p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl transition-all cursor-pointer flex items-center justify-center"
+                title="Volver al Menú Principal"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
               <div className="bg-sky-600 text-white p-2 rounded-xl shadow-md shadow-sky-100 dark:shadow-none">
                 <Activity className="h-6 w-6" />
               </div>

@@ -10,7 +10,7 @@ interface PatientState {
   weightKg: number;
   heightCm: number;
   bsa: number;
-  activeTab: 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'historial';
+  activeTab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'historial' | 'info';
   history: PatientConsultation[];
   isLoadingHistory: boolean;
   user: SupabaseUser | null;
@@ -22,7 +22,7 @@ interface PatientContextType extends PatientState {
   setAgeMonths: (months: number) => void;
   setWeightKg: (weight: number) => void;
   setHeightCm: (height: number) => void;
-  setActiveTab: (tab: 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'historial') => void;
+  setActiveTab: (tab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'historial' | 'info') => void;
   saveCurrentConsultation: (
     type: 'mantenimiento' | 'quemaduras' | 'cad' | 'eda',
     details: Record<string, any>
@@ -43,7 +43,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
   const [bsa, setBsa] = useState<number>(0);
 
   // App navigation
-  const [activeTab, setActiveTab] = useState<'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'historial'>('mantenimiento');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'historial' | 'info'>('dashboard');
 
   // History state
   const [history, setHistory] = useState<PatientConsultation[]>([]);
