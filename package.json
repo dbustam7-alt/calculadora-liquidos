@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "mobile:build": "next build && bunx cap sync",
+    "mobile:open:ios": "bunx cap open ios",
+    "mobile:open:android": "bunx cap open android"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",

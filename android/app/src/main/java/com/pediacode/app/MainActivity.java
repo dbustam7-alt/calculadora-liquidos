@@ -1,4 +1,4 @@
-package com.pediatricode.app;
+package com.pediacode.app;
 
 import com.getcapacitor.BridgeActivity;
 

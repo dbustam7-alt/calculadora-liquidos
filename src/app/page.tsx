@@ -14,10 +14,9 @@ import EquipmentModule from '@/components/EquipmentModule';
 import MedsModule from '@/components/MedsModule';
 import ToxicologyModule from '@/components/ToxicologyModule';
 import PalsModule from '@/components/PalsModule';
-import AuthScreen from '@/components/AuthScreen';
 
 export default function Home() {
-  const { activeTab, user, isAuthLoading } = usePatient();
+  const { activeTab } = usePatient();
 
   // Mobile App Branch: Auth check bypassed to allow instant access without login
   /*

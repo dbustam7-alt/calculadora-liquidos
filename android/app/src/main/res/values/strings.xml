@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">PediatriCode</string>
-    <string name="title_activity_main">PediatriCode</string>
-    <string name="package_name">com.pediatricode.app</string>
-    <string name="custom_url_scheme">com.pediatricode.app</string>
+    <string name="app_name">PediaCode</string>
+    <string name="title_activity_main">PediaCode</string>
+    <string name="package_name">com.pediacode.app</string>
+    <string name="custom_url_scheme">com.pediacode.app</string>
 </resources>
