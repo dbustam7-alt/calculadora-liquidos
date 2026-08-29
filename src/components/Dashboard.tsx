@@ -162,9 +162,11 @@ export default function Dashboard() {
           {/* Welcome Banner */}
           <div className="bg-gradient-to-r from-sky-600 to-indigo-600 dark:from-sky-950/40 dark:to-indigo-950/40 border border-sky-100/10 rounded-3xl p-6 md:p-8 text-white shadow-lg shadow-sky-100/20 dark:shadow-none">
             <div className="max-w-3xl space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider bg-white/20 dark:bg-sky-900/40 px-3 py-1 rounded-full">
-                {user?.user_metadata?.hospital || 'Hospital Activo'}
-              </span>
+              {user?.user_metadata?.hospital && (
+                <span className="text-xs font-bold uppercase tracking-wider bg-white/20 dark:bg-sky-900/40 px-3 py-1 rounded-full">
+                  {user.user_metadata.hospital}
+                </span>
+              )}
               <h2 className="text-2xl md:text-3xl font-extrabold leading-tight">
                 Hola, {user?.user_metadata?.full_name?.split(' ')[0] || 'Doctor'}.
               </h2>
