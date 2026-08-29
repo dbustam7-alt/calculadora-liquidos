@@ -13,6 +13,7 @@ export default function PatientHeader() {
     heightCm,
     bsa,
     activeTab,
+    currentModule,
     user,
     darkMode,
     setAgeMonths,
@@ -54,6 +55,19 @@ export default function PatientHeader() {
     { id: 'historial', label: 'Historial', icon: <Clock className="h-4 w-4" /> },
     { id: 'info', label: 'Información', icon: <HelpCircle className="h-4 w-4" /> },
   ] as const;
+
+  // Filter tabs dynamically based on the active parent module
+  const filteredTabs = tabs.filter((tab) => {
+    if (currentModule === 'equipamiento') {
+      // For Equipamiento module, only show Equipamiento, Historial, and Info
+      return ['equipamiento', 'historial', 'info'].includes(tab.id);
+    }
+    if (currentModule === 'liquidos') {
+      // For Líquidos module, show everything except Equipamiento
+      return ['mantenimiento', 'quemaduras', 'cad', 'eda', 'historial', 'info'].includes(tab.id);
+    }
+    return true;
+  });
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
@@ -194,7 +208,7 @@ export default function PatientHeader() {
         {/* Navigation Tabs & Desktop Sign Out */}
         <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 mt-2 overflow-x-auto scrollbar-none">
           <nav className="flex space-x-1 py-1 min-w-max" aria-label="Tabs">
-            {tabs.map((tab) => {
+            {filteredTabs.map((tab) => {
               const isSelected = activeTab === tab.id;
               return (
                 <button

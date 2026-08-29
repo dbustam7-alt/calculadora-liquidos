@@ -11,6 +11,7 @@ interface PatientState {
   heightCm: number;
   bsa: number;
   activeTab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'historial' | 'info';
+  currentModule: 'liquidos' | 'equipamiento' | null;
   history: PatientConsultation[];
   isLoadingHistory: boolean;
   user: SupabaseUser | null;
@@ -43,7 +44,19 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
   const [bsa, setBsa] = useState<number>(0);
 
   // App navigation
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'historial' | 'info'>('dashboard');
+  const [activeTab, setActiveTabState] = useState<'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'historial' | 'info'>('dashboard');
+  const [currentModule, setCurrentModule] = useState<'liquidos' | 'equipamiento' | null>(null);
+
+  const setActiveTab = (tab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'historial' | 'info') => {
+    setActiveTabState(tab);
+    if (tab === 'dashboard') {
+      setCurrentModule(null);
+    } else if (tab === 'equipamiento') {
+      setCurrentModule('equipamiento');
+    } else if (['mantenimiento', 'quemaduras', 'cad', 'eda'].includes(tab)) {
+      setCurrentModule('liquidos');
+    }
+  };
 
   // History state
   const [history, setHistory] = useState<PatientConsultation[]>([]);
@@ -193,6 +206,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
         heightCm,
         bsa,
         activeTab,
+        currentModule,
         history,
         isLoadingHistory,
         user,
