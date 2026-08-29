@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'PediatriCode - Calculadora Pediátrica de Urgencias',
+  title: 'PediaCode - Calculadora Pediátrica de Urgencias',
   description: 'Calculadora clínica de líquidos y electrólitos para urgencias pediátricas. Holliday-Segar, Parkland, CAD y Planes de la OMS.',
 };
 
@@ -28,7 +28,7 @@ export default function RootLayout({
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
+      <body className="min-h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
         <PatientProvider>
           {children}
         </PatientProvider>

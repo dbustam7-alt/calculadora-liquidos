@@ -10,18 +10,20 @@ interface PatientState {
   weightKg: number;
   heightCm: number;
   bsa: number;
-  activeTab: 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'historial';
+  activeTab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'historial' | 'info';
+  currentModule: 'liquidos' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'info' | null;
   history: PatientConsultation[];
   isLoadingHistory: boolean;
   user: SupabaseUser | null;
   isAuthLoading: boolean;
+  darkMode: boolean;
 }
 
 interface PatientContextType extends PatientState {
   setAgeMonths: (months: number) => void;
   setWeightKg: (weight: number) => void;
   setHeightCm: (height: number) => void;
-  setActiveTab: (tab: 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'historial') => void;
+  setActiveTab: (tab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'historial' | 'info') => void;
   saveCurrentConsultation: (
     type: 'mantenimiento' | 'quemaduras' | 'cad' | 'eda',
     details: Record<string, any>
@@ -29,6 +31,7 @@ interface PatientContextType extends PatientState {
   deleteConsultation: (id: string) => Promise<boolean>;
   refreshHistory: () => Promise<void>;
   signOut: () => Promise<void>;
+  toggleDarkMode: () => void;
 }
 
 const PatientContext = createContext<PatientContextType | undefined>(undefined);
@@ -41,7 +44,29 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
   const [bsa, setBsa] = useState<number>(0);
 
   // App navigation
-  const [activeTab, setActiveTab] = useState<'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'historial'>('mantenimiento');
+  const [activeTab, setActiveTabState] = useState<'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'historial' | 'info'>('dashboard');
+  const [currentModule, setCurrentModule] = useState<'liquidos' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'info' | null>(null);
+
+  const setActiveTab = (tab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'historial' | 'info') => {
+    setActiveTabState(tab);
+    if (tab === 'dashboard') {
+      setCurrentModule(null);
+    } else if (tab === 'equipamiento') {
+      setCurrentModule('equipamiento');
+    } else if (tab === 'medicamentos') {
+      setCurrentModule('medicamentos');
+    } else if (tab === 'toxicologia') {
+      setCurrentModule('toxicologia');
+    } else if (tab === 'pals') {
+      setCurrentModule('pals');
+    } else if (tab === 'info') {
+      // If navigating to info directly, set currentModule to 'info' to isolate it
+      // but if we are already in a module, clicking 'info' tab preserves the module context
+      setCurrentModule((prev) => prev === null ? 'info' : prev);
+    } else if (['mantenimiento', 'quemaduras', 'cad', 'eda'].includes(tab)) {
+      setCurrentModule('liquidos');
+    }
+  };
 
   // History state
   const [history, setHistory] = useState<PatientConsultation[]>([]);
@@ -50,6 +75,35 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
   // Auth state
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+
+  // Theme / Dark Mode state
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+
+  // Load initial theme from localStorage or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialDark = savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
+    setDarkMode(initialDark);
+    if (initialDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => {
+      const next = !prev;
+      localStorage.setItem('theme', next ? 'dark' : 'light');
+      if (next) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      return next;
+    });
+  };
 
   // Listen to Auth changes
   useEffect(() => {
@@ -162,10 +216,12 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
         heightCm,
         bsa,
         activeTab,
+        currentModule,
         history,
         isLoadingHistory,
         user,
         isAuthLoading,
+        darkMode,
         setAgeMonths,
         setWeightKg,
         setHeightCm,
@@ -174,6 +230,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
         deleteConsultation,
         refreshHistory,
         signOut,
+        toggleDarkMode,
       }}
     >
       {children}

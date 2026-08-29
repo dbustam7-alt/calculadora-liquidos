@@ -29,3 +29,14 @@
 - [x] Registro expandido con datos profesionales (Nombre, Especialidad, Hospital, Registro Médico).
 - [x] Integración de Inicio de Sesión con Google (Google OAuth).
 - [x] Vinculación a repositorio en GitHub y despliegue continuo en Vercel (Listo para producción).
+
+## Phase 6: Monetization & Premium Features
+- [x] Implementación de Modo Oscuro Nativo con persistencia local y toggle en Header.
+- [x] Implementación de Selector Interactivo de Quemaduras (Lund-Browder) con diagramas corporales SVG interactivos.
+- [x] Implementación del Dashboard Hub (Menú Principal) para expansión modular de urgencias pediátricas.
+- [x] Implementación del Módulo de Equipamiento y Vía Aérea Pediátrica.
+- [x] Implementación del Módulo de Medicamentos de Urgencia Pediátrica.
+- [x] Implementación del Módulo de Toxicología y Antídotos Pediátricos.
+- [x] Implementación del Módulo de Reanimación PALS Pediátrica.
+- [x] Reorganización e Implementación del Módulo de Información, Legal y Soporte.
+- [ ] Configuración e integración de Capacitor para compilación nativa en iOS y Android (en rama de desarrollo).

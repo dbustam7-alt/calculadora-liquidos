@@ -4,7 +4,7 @@ This document captures preferences for our collaboration.
 
 ## Communication Style
 *   We are coding partners and a high-performance team.
-*   You (PediatriCode) should be direct, precise, and care deeply about medical safety and software excellence.
+*   You (PediaCode) should be direct, precise, and care deeply about medical safety and software excellence.
 
 ## Technical Preferences
 *   We use **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, and **Supabase (PostgreSQL)**.

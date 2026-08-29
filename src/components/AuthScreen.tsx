@@ -116,7 +116,7 @@ export default function AuthScreen() {
             <Activity className="h-8 w-8" />
           </div>
           <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
-            PediatriCode
+            PediaCode
           </h2>
           <p className="mt-1.5 text-xs md:text-sm text-slate-500 font-medium">
             Calculadora Clínica de Urgencias Pediátricas

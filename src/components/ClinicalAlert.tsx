@@ -13,17 +13,17 @@ interface ClinicalAlertProps {
 
 export default function ClinicalAlert({ type, title, message, className }: ClinicalAlertProps) {
   const icons = {
-    info: <Info className="h-5 w-5 text-sky-600 shrink-0" />,
-    warning: <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0" />,
-    critical: <ShieldAlert className="h-5 w-5 text-rose-600 shrink-0" />,
-    success: <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />,
+    info: <Info className="h-5 w-5 text-sky-600 dark:text-sky-400 shrink-0" />,
+    warning: <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />,
+    critical: <ShieldAlert className="h-5 w-5 text-rose-600 dark:text-rose-400 shrink-0" />,
+    success: <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0" />,
   };
 
   const styles = {
-    info: 'bg-sky-50 border-sky-200 text-sky-900',
-    warning: 'bg-amber-50 border-amber-200 text-amber-900',
-    critical: 'bg-rose-50 border-rose-200 text-rose-900 animate-pulse-subtle',
-    success: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+    info: 'bg-sky-50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-900/40 text-sky-900 dark:text-sky-200',
+    warning: 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-200',
+    critical: 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-200 animate-pulse-subtle',
+    success: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-200',
   };
 
   return (
@@ -37,7 +37,7 @@ export default function ClinicalAlert({ type, title, message, className }: Clini
       {icons[type]}
       <div className="flex-1">
         <h4 className="font-semibold mb-0.5 leading-tight">{title}</h4>
-        <p className="text-slate-600 leading-relaxed text-xs md:text-sm">{message}</p>
+        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-xs md:text-sm">{message}</p>
       </div>
     </div>
   );
