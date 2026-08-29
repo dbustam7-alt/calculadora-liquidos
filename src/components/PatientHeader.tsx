@@ -62,28 +62,28 @@ export default function PatientHeader() {
   // Filter tabs dynamically based on the active parent module
   const filteredTabs = tabs.filter((tab) => {
     if (currentModule === 'equipamiento') {
-      // For Equipamiento module, only show Equipamiento, Historial, and Info
-      return ['equipamiento', 'historial', 'info'].includes(tab.id);
+      // For Equipamiento module, only show Equipamiento and Historial
+      return ['equipamiento', 'historial'].includes(tab.id);
     }
     if (currentModule === 'medicamentos') {
-      // For Medicamentos module, only show Medicamentos, Historial, and Info
-      return ['medicamentos', 'historial', 'info'].includes(tab.id);
+      // For Medicamentos module, only show Medicamentos and Historial
+      return ['medicamentos', 'historial'].includes(tab.id);
     }
     if (currentModule === 'toxicologia') {
-      // For Toxicología module, only show Toxicología, Historial, and Info
-      return ['toxicologia', 'historial', 'info'].includes(tab.id);
+      // For Toxicología module, only show Toxicología and Historial
+      return ['toxicologia', 'historial'].includes(tab.id);
     }
     if (currentModule === 'pals') {
-      // For PALS module, only show PALS, Historial, and Info
-      return ['pals', 'historial', 'info'].includes(tab.id);
+      // For PALS module, only show PALS and Historial
+      return ['pals', 'historial'].includes(tab.id);
     }
     if (currentModule === 'info') {
       // For Info standalone module, only show Info
       return ['info'].includes(tab.id);
     }
     if (currentModule === 'liquidos') {
-      // For Líquidos module, show everything except Equipamiento, Medicamentos, Toxicología and PALS
-      return ['mantenimiento', 'quemaduras', 'cad', 'eda', 'historial', 'info'].includes(tab.id);
+      // For Líquidos module, show everything except Equipamiento, Medicamentos, Toxicología, PALS and Info
+      return ['mantenimiento', 'quemaduras', 'cad', 'eda', 'historial'].includes(tab.id);
     }
     return true;
   });
