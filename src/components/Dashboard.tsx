@@ -49,9 +49,10 @@ export default function Dashboard() {
       description: 'Dosificación exacta de fármacos de reanimación, sedación, analgesia, anticonvulsivantes, secuencia de intubación rápida y antibióticos según el peso.',
       icon: <Syringe className="h-7 w-7 text-rose-500 dark:text-rose-400" />,
       bgIcon: 'bg-rose-50 dark:bg-rose-950/30 border-rose-100 dark:border-rose-900/40',
-      active: false,
-      badge: 'Próximamente',
-      badgeStyle: 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+      active: true,
+      badge: 'Activo',
+      badgeStyle: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/40',
+      onClick: () => setActiveTab('medicamentos'),
     },
     {
       id: 'equipamiento',

@@ -52,6 +52,7 @@ export default function PatientHeader() {
     { id: 'cad', label: 'CAD / DKA', icon: <Syringe className="h-4 w-4" /> },
     { id: 'eda', label: 'EDA / OMS', icon: <Stethoscope className="h-4 w-4" /> },
     { id: 'equipamiento', label: 'Equipamiento', icon: <Wrench className="h-4 w-4" /> },
+    { id: 'medicamentos', label: 'Medicamentos', icon: <Syringe className="h-4 w-4" /> },
     { id: 'historial', label: 'Historial', icon: <Clock className="h-4 w-4" /> },
     { id: 'info', label: 'Información', icon: <HelpCircle className="h-4 w-4" /> },
   ] as const;
@@ -62,8 +63,12 @@ export default function PatientHeader() {
       // For Equipamiento module, only show Equipamiento, Historial, and Info
       return ['equipamiento', 'historial', 'info'].includes(tab.id);
     }
+    if (currentModule === 'medicamentos') {
+      // For Medicamentos module, only show Medicamentos, Historial, and Info
+      return ['medicamentos', 'historial', 'info'].includes(tab.id);
+    }
     if (currentModule === 'liquidos') {
-      // For Líquidos module, show everything except Equipamiento
+      // For Líquidos module, show everything except Equipamiento and Medicamentos
       return ['mantenimiento', 'quemaduras', 'cad', 'eda', 'historial', 'info'].includes(tab.id);
     }
     return true;

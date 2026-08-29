@@ -11,6 +11,7 @@ import ConsultationsHistory from '@/components/ConsultationsHistory';
 import InfoModule from '@/components/InfoModule';
 import Dashboard from '@/components/Dashboard';
 import EquipmentModule from '@/components/EquipmentModule';
+import MedsModule from '@/components/MedsModule';
 import AuthScreen from '@/components/AuthScreen';
 
 export default function Home() {
@@ -48,6 +49,8 @@ export default function Home() {
         return <EdaModule />;
       case 'equipamiento':
         return <EquipmentModule />;
+      case 'medicamentos':
+        return <MedsModule />;
       case 'historial':
         return <ConsultationsHistory />;
       case 'info':
