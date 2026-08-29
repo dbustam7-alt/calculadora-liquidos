@@ -103,8 +103,8 @@ export default function PatientHeader() {
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
-              <div className="bg-sky-600 text-white p-2 rounded-xl shadow-md shadow-sky-100 dark:shadow-none">
-                <Activity className="h-6 w-6" />
+              <div className="relative h-10 w-10 overflow-hidden rounded-xl shadow-md shadow-sky-100 dark:shadow-none bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200/50 dark:border-slate-700/50">
+                <img src="/logo.png" alt="PediaCode" className="h-full w-full object-cover" />
               </div>
               <div>
                 <h1 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">PediaCode</h1>

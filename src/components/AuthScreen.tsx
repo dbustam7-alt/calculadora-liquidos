@@ -112,8 +112,8 @@ export default function AuthScreen() {
       <div className="max-w-md w-full space-y-8 bg-white p-8 md:p-10 rounded-3xl border border-slate-200 shadow-xl shadow-slate-100 transition-all duration-300">
         {/* Branding */}
         <div className="text-center">
-          <div className="mx-auto bg-sky-600 text-white p-3.5 rounded-2xl shadow-lg shadow-sky-100 w-fit mb-4">
-            <Activity className="h-8 w-8" />
+          <div className="mx-auto relative h-16 w-16 overflow-hidden rounded-2xl shadow-lg shadow-sky-100 bg-slate-50 flex items-center justify-center border border-slate-200/50 mb-4">
+            <img src="/logo.png" alt="PediaCode" className="h-full w-full object-cover" />
           </div>
           <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
             PediaCode
