@@ -23,43 +23,46 @@ export default function ConsultationsHistory() {
     }
   };
 
-  // Filter history based on search term and date
-  const safeHistory = Array.isArray(history) ? history : [];
-  const filteredHistory = safeHistory.filter((c) => {
-    if (!c || !c.consultation_type) return false;
-    const label = getModuleLabel(c.consultation_type);
-    const matchesSearch =
-      (label || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (c.consultation_type || '').toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesDate = dateFilter && c.created_at ? c.created_at.startsWith(dateFilter) : true;
-
-    return matchesSearch && matchesDate;
-  });
+  // Safe string conversion to prevent React child object crashes
+  const renderVal = (val: any): string => {
+    if (val === undefined || val === null) return '';
+    if (typeof val === 'object') {
+      try {
+        return JSON.stringify(val);
+      } catch (e) {
+        return '[Objeto]';
+      }
+    }
+    return String(val);
+  };
 
   const getModuleIcon = (type: string) => {
+    const cleanType = String(type || '').toLowerCase();
     const icons: Record<string, React.ReactNode> = {
       mantenimiento: <Droplets className="h-5 w-5 text-sky-600 dark:text-sky-400" />,
       quemaduras: <Flame className="h-5 w-5 text-rose-600 dark:text-rose-400" />,
       cad: <Syringe className="h-5 w-5 text-sky-600 dark:text-sky-400" />,
       eda: <Stethoscope className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />,
     };
-    return icons[type] || <Droplets className="h-5 w-5 text-sky-600 dark:text-sky-400" />;
+    return icons[cleanType] || <Droplets className="h-5 w-5 text-sky-600 dark:text-sky-400" />;
   };
 
   const getModuleLabel = (type: string) => {
+    const cleanType = String(type || '').toLowerCase();
     const labels: Record<string, string> = {
       mantenimiento: 'Mantenimiento',
       quemaduras: 'Quemaduras',
       cad: 'CAD / DKA',
       eda: 'EDA / OMS',
     };
-    return labels[type] || 'Consulta';
+    return labels[cleanType] || 'Consulta';
   };
 
-  const formatDate = (isoString: string) => {
+  const formatDate = (isoString: any) => {
+    if (!isoString) return 'Fecha desconocida';
     try {
       const date = new Date(isoString);
+      if (isNaN(date.getTime())) return String(isoString);
       return date.toLocaleDateString('es-ES', {
         day: '2-digit',
         month: 'short',
@@ -68,9 +71,26 @@ export default function ConsultationsHistory() {
         minute: '2-digit',
       });
     } catch (e) {
-      return isoString;
+      return String(isoString || 'Fecha desconocida');
     }
   };
+
+  // Filter history based on search term and date with extreme defensiveness
+  const safeHistory = Array.isArray(history) ? history : [];
+  const filteredHistory = safeHistory.filter((c) => {
+    if (!c || typeof c !== 'object' || !c.consultation_type) return false;
+    
+    const typeStr = String(c.consultation_type);
+    const label = getModuleLabel(typeStr);
+    
+    const matchesSearch =
+      label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      typeStr.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesDate = dateFilter && c.created_at ? String(c.created_at).startsWith(dateFilter) : true;
+
+    return matchesSearch && matchesDate;
+  });
 
   return (
     <div className="space-y-6">
@@ -146,13 +166,13 @@ export default function ConsultationsHistory() {
                         {c.weight_kg !== undefined && c.weight_kg !== null && (
                           <>
                             <span>•</span>
-                            <span>{c.weight_kg} kg</span>
+                            <span>{renderVal(c.weight_kg)} kg</span>
                           </>
                         )}
                         {c.talla_cm !== undefined && c.talla_cm !== null && (
                           <>
                             <span>•</span>
-                            <span>{c.talla_cm} cm</span>
+                            <span>{renderVal(c.talla_cm)} cm</span>
                           </>
                         )}
                         {c.sc_m2 !== undefined && c.sc_m2 !== null && (
@@ -195,26 +215,26 @@ export default function ConsultationsHistory() {
                     <h5 className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">Detalles del Cálculo Clínico</h5>
 
                     {/* Render details based on type */}
-                    {c.consultation_type === 'mantenimiento' && (
+                    {String(c.consultation_type).toLowerCase() === 'mantenimiento' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl p-4 shadow-sm">
                           <h6 className="font-bold text-slate-800 dark:text-slate-200 text-xs mb-3">Holliday-Segar (Peso)</h6>
                           <div className="space-y-2 text-xs font-medium text-slate-600 dark:text-slate-300">
                             <div className="flex justify-between">
                               <span>Volumen Diario:</span>
-                              <span className="font-mono text-slate-900 dark:text-slate-100 font-bold">{c.details?.holliday?.dailyVolumeMl} mL/día</span>
+                              <span className="font-mono text-slate-900 dark:text-slate-100 font-bold">{renderVal(c.details?.holliday?.dailyVolumeMl)} mL/día</span>
                             </div>
                             <div className="flex justify-between">
                               <span>Tasa de Infusión:</span>
-                              <span className="font-mono text-sky-700 dark:text-sky-300 font-bold">{c.details?.holliday?.hourlyRateMlh} mL/h</span>
+                              <span className="font-mono text-sky-700 dark:text-sky-300 font-bold">{renderVal(c.details?.holliday?.hourlyRateMlh)} mL/h</span>
                             </div>
                             <div className="flex justify-between">
                               <span>Macrogoteo:</span>
-                              <span className="font-mono text-slate-900 dark:text-slate-100">{c.details?.holliday?.dropsPerMin} gotas/min</span>
+                              <span className="font-mono text-slate-900 dark:text-slate-100">{renderVal(c.details?.holliday?.dropsPerMin)} gotas/min</span>
                             </div>
                             <div className="flex justify-between">
                               <span>Microgoteo:</span>
-                              <span className="font-mono text-slate-900 dark:text-slate-100">{c.details?.holliday?.microdropsPerMin} ugotas/min</span>
+                              <span className="font-mono text-slate-900 dark:text-slate-100">{renderVal(c.details?.holliday?.microdropsPerMin)} ugotas/min</span>
                             </div>
                           </div>
                         </div>
@@ -225,13 +245,13 @@ export default function ConsultationsHistory() {
                             <div className="flex justify-between">
                               <span>Volumen Diario:</span>
                               <span className="font-mono text-slate-900 dark:text-slate-100 font-bold">
-                                {c.details?.bsaBased?.dailyVolumeMlMin} - {c.details?.bsaBased?.dailyVolumeMlMax} mL/día
+                                {renderVal(c.details?.bsaBased?.dailyVolumeMlMin)} - {renderVal(c.details?.bsaBased?.dailyVolumeMlMax)} mL/día
                               </span>
                             </div>
                             <div className="flex justify-between">
                               <span>Tasa de Infusión:</span>
                               <span className="font-mono text-emerald-700 dark:text-emerald-300 font-bold">
-                                {c.details?.bsaBased?.hourlyRateMlhMin} - {c.details?.bsaBased?.hourlyRateMlhMax} mL/h
+                                {renderVal(c.details?.bsaBased?.hourlyRateMlhMin)} - {renderVal(c.details?.bsaBased?.hourlyRateMlhMax)} mL/h
                               </span>
                             </div>
                           </div>
@@ -239,23 +259,23 @@ export default function ConsultationsHistory() {
                       </div>
                     )}
 
-                    {c.consultation_type === 'quemaduras' && (
+                    {String(c.consultation_type).toLowerCase() === 'quemaduras' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl p-4 shadow-sm">
                           <h6 className="font-bold text-slate-800 dark:text-slate-200 text-xs mb-3">Estimación y Parkland</h6>
                           <div className="space-y-2 text-xs font-medium text-slate-600 dark:text-slate-300">
                             <div className="flex justify-between">
                               <span>Porcentaje SCQ:</span>
-                              <span className="font-mono text-rose-600 dark:text-rose-400 font-bold">{c.details?.scqPercentage}%</span>
+                              <span className="font-mono text-rose-600 dark:text-rose-400 font-bold">{renderVal(c.details?.scqPercentage)}%</span>
                             </div>
                             <div className="flex justify-between">
                               <span>Volumen Total:</span>
-                              <span className="font-mono text-slate-900 dark:text-slate-100 font-bold">{c.details?.results?.totalVolumeMl} mL</span>
+                              <span className="font-mono text-slate-900 dark:text-slate-100 font-bold">{renderVal(c.details?.results?.totalVolumeMl)} mL</span>
                             </div>
                             {c.details?.results?.maintenanceAddedMl && (
                               <div className="flex justify-between">
                                 <span>Mantenimiento Añadido:</span>
-                                <span className="font-mono text-slate-900 dark:text-slate-100">{c.details?.results?.maintenanceAddedMl} mL</span>
+                                <span className="font-mono text-slate-900 dark:text-slate-100">{renderVal(c.details?.results?.maintenanceAddedMl)} mL</span>
                               </div>
                             )}
                           </div>
@@ -266,31 +286,31 @@ export default function ConsultationsHistory() {
                           <div className="space-y-2 text-xs font-medium text-slate-600 dark:text-slate-300">
                             <div className="flex justify-between border-b border-dashed border-slate-100 dark:border-slate-800 pb-1.5">
                               <span>Primeras 8 Horas:</span>
-                              <span className="font-mono text-rose-600 dark:text-rose-400 font-bold">{c.details?.results?.firstEightHoursRateMlh} mL/h</span>
+                              <span className="font-mono text-rose-600 dark:text-rose-400 font-bold">{renderVal(c.details?.results?.firstEightHoursRateMlh)} mL/h</span>
                             </div>
                             <div className="flex justify-between text-[10px] text-slate-400 dark:text-slate-500">
-                              <span>(Volumen: {c.details?.results?.firstEightHoursMl} mL)</span>
+                              <span>(Volumen: {renderVal(c.details?.results?.firstEightHoursMl)} mL)</span>
                             </div>
                             <div className="flex justify-between border-b border-dashed border-slate-100 dark:border-slate-800 pb-1.5 pt-1">
                               <span>Siguientes 16 Horas:</span>
-                              <span className="font-mono text-rose-600 dark:text-rose-400 font-bold">{c.details?.results?.nextSixteenHoursRateMlh} mL/h</span>
+                              <span className="font-mono text-rose-600 dark:text-rose-400 font-bold">{renderVal(c.details?.results?.nextSixteenHoursRateMlh)} mL/h</span>
                             </div>
                             <div className="flex justify-between text-[10px] text-slate-400 dark:text-slate-500">
-                              <span>(Volumen: {c.details?.results?.nextSixteenHoursMl} mL)</span>
+                              <span>(Volumen: {renderVal(c.details?.results?.nextSixteenHoursMl)} mL)</span>
                             </div>
                           </div>
                         </div>
                       </div>
                     )}
 
-                    {c.consultation_type === 'cad' && (
+                    {String(c.consultation_type).toLowerCase() === 'cad' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl p-4 shadow-sm">
                           <h6 className="font-bold text-slate-800 dark:text-slate-200 text-xs mb-3">Parámetros de Cetoacidosis</h6>
                           <div className="space-y-2 text-xs font-medium text-slate-600 dark:text-slate-300">
                             <div className="flex justify-between">
                               <span>Severidad:</span>
-                              <span className="font-semibold text-slate-900 dark:text-slate-100 capitalize">{c.details?.severity}</span>
+                              <span className="font-semibold text-slate-900 dark:text-slate-100 capitalize">{renderVal(c.details?.severity)}</span>
                             </div>
                             <div className="flex justify-between">
                               <span>Compromiso Hemodinámico:</span>
@@ -298,7 +318,7 @@ export default function ConsultationsHistory() {
                             </div>
                             <div className="flex justify-between">
                               <span>Basal Veces:</span>
-                              <span className="font-mono text-slate-900 dark:text-slate-100">{c.details?.basalVeces}x</span>
+                              <span className="font-mono text-slate-900 dark:text-slate-100">{renderVal(c.details?.basalVeces)}x</span>
                             </div>
                           </div>
                         </div>
@@ -308,21 +328,21 @@ export default function ConsultationsHistory() {
                           <div className="space-y-2 text-xs font-medium text-slate-600 dark:text-slate-300">
                             <div className="flex justify-between">
                               <span>Bolo 10 mL/kg:</span>
-                              <span className="font-mono text-slate-900 dark:text-slate-100 font-bold">{c.details?.results?.bolus10VolumeMl} mL</span>
+                              <span className="font-mono text-slate-900 dark:text-slate-100 font-bold">{renderVal(c.details?.results?.bolus10VolumeMl)} mL</span>
                             </div>
                             <div className="flex justify-between">
                               <span>Bolo 20 mL/kg (Shock):</span>
-                              <span className="font-mono text-slate-900 dark:text-slate-100 font-bold">{c.details?.results?.bolus20VolumeMl} mL</span>
+                              <span className="font-mono text-slate-900 dark:text-slate-100 font-bold">{renderVal(c.details?.results?.bolus20VolumeMl)} mL</span>
                             </div>
                             {c.details?.results?.totalVolumeMl48h ? (
                               <>
                                 <div className="flex justify-between border-t border-dashed border-slate-100 dark:border-slate-800 pt-1.5 mt-1">
                                   <span>Volumen Total 48h:</span>
-                                  <span className="font-mono text-sky-700 dark:text-sky-300 font-bold">{c.details?.results?.totalVolumeMl48h} mL</span>
+                                  <span className="font-mono text-sky-700 dark:text-sky-300 font-bold">{renderVal(c.details?.results?.totalVolumeMl48h)} mL</span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span>Tasa de Infusión (48h):</span>
-                                  <span className="font-mono text-sky-700 dark:text-sky-300 font-bold">{c.details?.results?.hourlyRateMlh48h} mL/h</span>
+                                  <span className="font-mono text-sky-700 dark:text-sky-300 font-bold">{renderVal(c.details?.results?.hourlyRateMlh48h)} mL/h</span>
                                 </div>
                               </>
                             ) : (
@@ -330,13 +350,13 @@ export default function ConsultationsHistory() {
                                 <div className="flex justify-between border-t border-dashed border-slate-100 dark:border-slate-800 pt-1.5 mt-1">
                                   <span>Volumen Diario (24h):</span>
                                   <span className="font-mono text-sky-700 dark:text-sky-300 font-bold">
-                                    {c.details?.results?.dailyVolumeMlMin} - {c.details?.results?.dailyVolumeMlMax} mL
+                                    {renderVal(c.details?.results?.dailyVolumeMlMin)} - {renderVal(c.details?.results?.dailyVolumeMlMax)} mL
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span>Tasa de Infusión (24h):</span>
                                   <span className="font-mono text-sky-700 dark:text-sky-300 font-bold">
-                                    {c.details?.results?.hourlyRateMlhMin} - {c.details?.results?.hourlyRateMlhMax} mL/h
+                                    {renderVal(c.details?.results?.hourlyRateMlhMin)} - {renderVal(c.details?.results?.hourlyRateMlhMax)} mL/h
                                   </span>
                                 </div>
                               </>
@@ -346,25 +366,31 @@ export default function ConsultationsHistory() {
                       </div>
                     )}
 
-                    {c.consultation_type === 'eda' && (
+                    {String(c.consultation_type).toLowerCase() === 'eda' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl p-4 shadow-sm">
                           <h6 className="font-bold text-slate-800 dark:text-slate-200 text-xs mb-3">Diagnóstico y Plan</h6>
                           <div className="space-y-2 text-xs font-medium text-slate-600 dark:text-slate-300">
                             <div className="flex justify-between">
                               <span>Plan Seleccionado:</span>
-                              <span className="font-bold text-emerald-600 dark:text-emerald-400">Plan {c.details?.results?.plan}</span>
+                              <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                                Plan {renderVal(c.details?.results?.plan || c.details?.results?.recommendedPlan)}
+                              </span>
                             </div>
                             <div className="flex justify-between">
                               <span>Volumen Requerido:</span>
                               <span className="font-mono text-slate-900 dark:text-slate-100 font-bold">
-                                {c.details?.results?.volumeMl ? `${c.details?.results?.volumeMl} mL` : 'N/A'}
+                                {c.details?.results?.volumeMl || c.details?.results?.fluidVolumeMl 
+                                  ? `${renderVal(c.details?.results?.volumeMl || c.details?.results?.fluidVolumeMl)} mL` 
+                                  : 'N/A'}
                               </span>
                             </div>
-                            {c.details?.results?.zincDose && (
+                            {(c.details?.results?.zincDose || c.details?.results?.zincDoseMg) && (
                               <div className="flex justify-between">
                                 <span>Dosis de Zinc:</span>
-                                <span className="font-mono text-slate-900 dark:text-slate-100 font-bold">{c.details?.results?.zincDose}</span>
+                                <span className="font-mono text-slate-900 dark:text-slate-100 font-bold">
+                                  {renderVal(c.details?.results?.zincDose || `${c.details?.results?.zincDoseMg} mg`)}
+                                </span>
                               </div>
                             )}
                           </div>
@@ -373,7 +399,7 @@ export default function ConsultationsHistory() {
                         <div className="bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl p-4 shadow-sm">
                           <h6 className="font-bold text-slate-800 dark:text-slate-200 text-xs mb-3">Instrucciones de Rehidratación</h6>
                           <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
-                            {c.details?.results?.description}
+                            {renderVal(c.details?.results?.description || c.details?.results?.planDetails)}
                           </p>
                         </div>
                       </div>
