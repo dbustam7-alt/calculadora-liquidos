@@ -76,31 +76,32 @@ export default function ConsultationsHistory() {
     }
   };
 
-  // Filter history based on active parent module and specific sub-module filters
+  // Filter history based on active parent module and specific sub-module filters with extreme safety
   const safeHistory = Array.isArray(history) ? history : [];
   const filteredHistory = safeHistory.filter((c) => {
     if (!c || typeof c !== 'object' || !c.consultation_type) return false;
     
     const typeStr = String(c.consultation_type).toLowerCase();
+    const isLiquidType = ['mantenimiento', 'quemaduras', 'cad', 'eda'].includes(typeStr);
     
     // 1. Separation by Parent Module
     if (currentModule === 'liquidos') {
       // Only allow liquid-related consultation types
-      const isLiquidType = ['mantenimiento', 'quemaduras', 'cad', 'eda'].includes(typeStr);
       if (!isLiquidType) return false;
       
       // Filter by specific sub-module if selected
       if (subModuleFilter !== 'all' && typeStr !== subModuleFilter) {
         return false;
       }
-    } else if (currentModule === 'equipamiento') {
-      if (typeStr !== 'equipamiento') return false;
-    } else if (currentModule === 'medicamentos') {
-      if (typeStr !== 'medicamentos') return false;
-    } else if (currentModule === 'toxicologia') {
-      if (typeStr !== 'toxicologia') return false;
-    } else if (currentModule === 'pals') {
-      if (typeStr !== 'pals') return false;
+    } else {
+      // If we are in ANY other module (medicamentos, equipamiento, toxicologia, pals, info, or null),
+      // we must NEVER show liquid-related consultations.
+      if (isLiquidType) return false;
+      
+      // For other modules, only show their respective consultations
+      if (currentModule && typeStr !== String(currentModule).toLowerCase()) {
+        return false;
+      }
     }
 
     // 2. Search Term and Date Filters
