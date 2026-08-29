@@ -34,4 +34,7 @@
 - [x] Implementación de Modo Oscuro Nativo con persistencia local y toggle en Header.
 - [x] Implementación de Selector Interactivo de Quemaduras (Lund-Browder) con diagramas corporales SVG interactivos.
 - [x] Implementación del Dashboard Hub (Menú Principal) para expansión modular de urgencias pediátricas.
+- [x] Implementación del Módulo de Equipamiento y Vía Aérea Pediátrica.
+- [x] Implementación del Módulo de Medicamentos de Urgencia Pediátrica.
+- [x] Implementación del Módulo de Toxicología y Antídotos Pediátricos.
 - [ ] Configuración e integración de Capacitor para compilación nativa en iOS y Android (en rama de desarrollo).
