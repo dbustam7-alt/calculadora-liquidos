@@ -56,7 +56,8 @@ function getLocalConsultations(): PatientConsultation[] {
     const data = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (!data) return [];
     const parsed = JSON.parse(data);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((c) => c && typeof c === 'object' && c.id);
   } catch (error) {
     console.error('Error reading from localStorage:', error);
     return [];
@@ -142,17 +143,24 @@ export async function getConsultations(): Promise<{ data: PatientConsultation[];
       }
 
       // Merge local and remote consultations, removing duplicates by ID
-      const merged = Array.isArray(data) ? [...(data as PatientConsultation[])] : [];
+      const rawMerged = Array.isArray(data) ? (data as PatientConsultation[]) : [];
+      const merged = rawMerged.filter((c) => c && typeof c === 'object' && c.id);
+      
       const remoteIds = new Set(merged.map((c) => c.id));
       
-      for (const local of localData) {
+      const cleanLocalData = Array.isArray(localData) ? localData.filter((c) => c && typeof c === 'object' && c.id) : [];
+      for (const local of cleanLocalData) {
         if (!remoteIds.has(local.id)) {
           merged.push(local);
         }
       }
 
-      // Sort merged by date descending
-      merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      // Sort merged by date descending safely
+      merged.sort((a, b) => {
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateB - dateA;
+      });
 
       return { data: merged, error: null };
     } catch (err) {
