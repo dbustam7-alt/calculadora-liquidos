@@ -54,7 +54,9 @@ function getLocalConsultations(): PatientConsultation[] {
   if (typeof window === 'undefined') return [];
   try {
     const data = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+    if (!data) return [];
+    const parsed = JSON.parse(data);
+    return Array.isArray(parsed) ? parsed : [];
   } catch (error) {
     console.error('Error reading from localStorage:', error);
     return [];
@@ -140,7 +142,7 @@ export async function getConsultations(): Promise<{ data: PatientConsultation[];
       }
 
       // Merge local and remote consultations, removing duplicates by ID
-      const merged = [...(data as PatientConsultation[])];
+      const merged = Array.isArray(data) ? [...(data as PatientConsultation[])] : [];
       const remoteIds = new Set(merged.map((c) => c.id));
       
       for (const local of localData) {
