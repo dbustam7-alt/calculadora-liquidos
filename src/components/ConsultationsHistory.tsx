@@ -143,12 +143,24 @@ export default function ConsultationsHistory() {
                         <span className="font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/30 border border-sky-100/50 dark:border-sky-900/40 px-1.5 py-0.5 rounded-md">
                           {formatDate(c.created_at)}
                         </span>
-                        <span>•</span>
-                        <span>{c.weight_kg} kg</span>
-                        <span>•</span>
-                        <span>{c.talla_cm} cm</span>
-                        <span>•</span>
-                        <span>{c.sc_m2.toFixed(3)} m²</span>
+                        {c.weight_kg !== undefined && c.weight_kg !== null && (
+                          <>
+                            <span>•</span>
+                            <span>{c.weight_kg} kg</span>
+                          </>
+                        )}
+                        {c.talla_cm !== undefined && c.talla_cm !== null && (
+                          <>
+                            <span>•</span>
+                            <span>{c.talla_cm} cm</span>
+                          </>
+                        )}
+                        {c.sc_m2 !== undefined && c.sc_m2 !== null && (
+                          <>
+                            <span>•</span>
+                            <span>{(Number(c.sc_m2) || 0).toFixed(3)} m²</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
