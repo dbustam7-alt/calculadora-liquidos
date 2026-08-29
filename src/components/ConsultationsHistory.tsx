@@ -2,15 +2,16 @@
 
 import React, { useState } from 'react';
 import { usePatient } from '@/context/PatientContext';
-import { Search, Calendar, Trash2, ChevronDown, ChevronUp, Droplets, Flame, Syringe, Stethoscope, AlertCircle } from 'lucide-react';
+import { Search, Calendar, Trash2, ChevronDown, ChevronUp, Droplets, Flame, Syringe, Stethoscope, AlertCircle, Layers } from 'lucide-react';
 import { PatientConsultation } from '@/lib/supabase';
 import { clsx } from 'clsx';
 
 export default function ConsultationsHistory() {
-  const { history, isLoadingHistory, deleteConsultation } = usePatient();
+  const { history, isLoadingHistory, deleteConsultation, currentModule } = usePatient();
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [dateFilter, setDateFilter] = useState<string>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [subModuleFilter, setSubModuleFilter] = useState<'all' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda'>('all');
 
   const handleToggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
@@ -75,14 +76,35 @@ export default function ConsultationsHistory() {
     }
   };
 
-  // Filter history based on search term and date with extreme defensiveness
+  // Filter history based on active parent module and specific sub-module filters
   const safeHistory = Array.isArray(history) ? history : [];
   const filteredHistory = safeHistory.filter((c) => {
     if (!c || typeof c !== 'object' || !c.consultation_type) return false;
     
-    const typeStr = String(c.consultation_type);
-    const label = getModuleLabel(typeStr);
+    const typeStr = String(c.consultation_type).toLowerCase();
     
+    // 1. Separation by Parent Module
+    if (currentModule === 'liquidos') {
+      // Only allow liquid-related consultation types
+      const isLiquidType = ['mantenimiento', 'quemaduras', 'cad', 'eda'].includes(typeStr);
+      if (!isLiquidType) return false;
+      
+      // Filter by specific sub-module if selected
+      if (subModuleFilter !== 'all' && typeStr !== subModuleFilter) {
+        return false;
+      }
+    } else if (currentModule === 'equipamiento') {
+      if (typeStr !== 'equipamiento') return false;
+    } else if (currentModule === 'medicamentos') {
+      if (typeStr !== 'medicamentos') return false;
+    } else if (currentModule === 'toxicologia') {
+      if (typeStr !== 'toxicologia') return false;
+    } else if (currentModule === 'pals') {
+      if (typeStr !== 'pals') return false;
+    }
+
+    // 2. Search Term and Date Filters
+    const label = getModuleLabel(typeStr);
     const matchesSearch =
       label.toLowerCase().includes(searchTerm.toLowerCase()) ||
       typeStr.toLowerCase().includes(searchTerm.toLowerCase());
@@ -92,8 +114,108 @@ export default function ConsultationsHistory() {
     return matchesSearch && matchesDate;
   });
 
+  // Get localized empty message based on the active module
+  const getEmptyMessage = () => {
+    if (currentModule === 'equipamiento') {
+      return {
+        title: 'Historial de Equipamiento vacío',
+        description: 'No hay registros guardados para Equipamiento y Vía Aérea. Este módulo es de referencia interactiva rápida basada en el peso/edad del paciente y no requiere guardar consultas.',
+      };
+    }
+    if (currentModule === 'medicamentos') {
+      return {
+        title: 'Historial de Medicamentos vacío',
+        description: 'No hay registros guardados para Medicamentos de Urgencia. Este módulo calcula dosis de seguridad en tiempo real según el peso del paciente y no requiere guardar consultas.',
+      };
+    }
+    if (currentModule === 'toxicologia') {
+      return {
+        title: 'Historial de Toxicología vacío',
+        description: 'No hay registros guardados para Toxicología y Antídotos. Este módulo sirve como guía de descontaminación y dosificación rápida sin persistencia de datos.',
+      };
+    }
+    if (currentModule === 'pals') {
+      return {
+        title: 'Historial de PALS vacío',
+        description: 'No hay registros guardados para Reanimación PALS. Este módulo interactivo de soporte vital avanzado se ejecuta en tiempo real para máxima agilidad clínica.',
+      };
+    }
+    return {
+      title: 'No se encontraron registros',
+      description: 'No hay consultas guardadas que coincidan con la búsqueda actual o aún no se han registrado consultas en este módulo.',
+    };
+  };
+
+  const emptyMsg = getEmptyMessage();
+
   return (
     <div className="space-y-6">
+      {/* Sub-module Filter Tabs (Only shown for Líquidos y Electrólitos) */}
+      {currentModule === 'liquidos' && (
+        <div className="flex flex-wrap gap-1.5 bg-slate-100 dark:bg-slate-900/60 p-1.5 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 transition-colors">
+          <button
+            onClick={() => setSubModuleFilter('all')}
+            className={clsx(
+              'flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer',
+              subModuleFilter === 'all'
+                ? 'bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 shadow-sm border border-slate-200/50 dark:border-slate-700/50'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+            )}
+          >
+            <Layers className="h-3.5 w-3.5" />
+            Todos los Líquidos
+          </button>
+          <button
+            onClick={() => setSubModuleFilter('mantenimiento')}
+            className={clsx(
+              'flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer',
+              subModuleFilter === 'mantenimiento'
+                ? 'bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 shadow-sm border border-slate-200/50 dark:border-slate-700/50'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+            )}
+          >
+            <Droplets className="h-3.5 w-3.5 text-sky-500" />
+            Mantenimiento
+          </button>
+          <button
+            onClick={() => setSubModuleFilter('quemaduras')}
+            className={clsx(
+              'flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer',
+              subModuleFilter === 'quemaduras'
+                ? 'bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 shadow-sm border border-slate-200/50 dark:border-slate-700/50'
+                : 'text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400'
+            )}
+          >
+            <Flame className="h-3.5 w-3.5 text-rose-500" />
+            Quemaduras
+          </button>
+          <button
+            onClick={() => setSubModuleFilter('cad')}
+            className={clsx(
+              'flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer',
+              subModuleFilter === 'cad'
+                ? 'bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 shadow-sm border border-slate-200/50 dark:border-slate-700/50'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+            )}
+          >
+            <Syringe className="h-3.5 w-3.5 text-sky-500" />
+            CAD / DKA
+          </button>
+          <button
+            onClick={() => setSubModuleFilter('eda')}
+            className={clsx(
+              'flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer',
+              subModuleFilter === 'eda'
+                ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200/50 dark:border-slate-700/50'
+                : 'text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400'
+            )}
+          >
+            <Stethoscope className="h-3.5 w-3.5 text-emerald-500" />
+            EDA / OMS
+          </button>
+        </div>
+      )}
+
       {/* Search and Filter Controls */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 md:p-6 shadow-sm transition-colors">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -129,11 +251,11 @@ export default function ConsultationsHistory() {
           <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Cargando historial clínico...</p>
         </div>
       ) : filteredHistory.length === 0 ? (
-        <div className="text-center py-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-colors">
+        <div className="text-center py-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-colors px-4">
           <AlertCircle className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-          <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">No se encontraron registros</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-1 leading-relaxed">
-            No hay consultas guardadas que coincidan con la búsqueda actual o aún no se han registrado consultas.
+          <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">{emptyMsg.title}</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1 leading-relaxed">
+            {emptyMsg.description}
           </p>
         </div>
       ) : (
