@@ -13,7 +13,8 @@ import {
   Sun, 
   Moon, 
   User,
-  Lock
+  Lock,
+  Wrench
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -56,11 +57,12 @@ export default function Dashboard() {
       id: 'equipamiento',
       title: 'Equipamiento y Vía Aérea',
       description: 'Sugerencias automáticas de tamaño de tubos endotraqueales, palas de laringoscopio, mascarillas, catéteres, sondas Foley y tamaño de manguito de presión.',
-      icon: <Activity className="h-7 w-7 text-emerald-500 dark:text-emerald-400" />,
+      icon: <Wrench className="h-7 w-7 text-emerald-500 dark:text-emerald-400" />,
       bgIcon: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-900/40',
-      active: false,
-      badge: 'Próximamente',
-      badgeStyle: 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+      active: true,
+      badge: 'Activo',
+      badgeStyle: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/40',
+      onClick: () => setActiveTab('equipamiento'),
     },
     {
       id: 'pals',

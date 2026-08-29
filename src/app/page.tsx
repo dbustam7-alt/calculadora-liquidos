@@ -10,6 +10,7 @@ import EdaModule from '@/components/EdaModule';
 import ConsultationsHistory from '@/components/ConsultationsHistory';
 import InfoModule from '@/components/InfoModule';
 import Dashboard from '@/components/Dashboard';
+import EquipmentModule from '@/components/EquipmentModule';
 import AuthScreen from '@/components/AuthScreen';
 
 export default function Home() {
@@ -45,6 +46,8 @@ export default function Home() {
         return <DkaModule />;
       case 'eda':
         return <EdaModule />;
+      case 'equipamiento':
+        return <EquipmentModule />;
       case 'historial':
         return <ConsultationsHistory />;
       case 'info':

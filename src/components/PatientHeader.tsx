@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePatient } from '@/context/PatientContext';
-import { Calendar, Weight, Ruler, Activity, Droplets, Flame, Syringe, Stethoscope, Clock, LogOut, Sun, Moon, HelpCircle, ArrowLeft } from 'lucide-react';
+import { Calendar, Weight, Ruler, Activity, Droplets, Flame, Syringe, Stethoscope, Clock, LogOut, Sun, Moon, HelpCircle, ArrowLeft, Wrench } from 'lucide-react';
 import ClinicalAlert from './ClinicalAlert';
 import { clsx } from 'clsx';
 
@@ -50,6 +50,7 @@ export default function PatientHeader() {
     { id: 'quemaduras', label: 'Quemaduras', icon: <Flame className="h-4 w-4" /> },
     { id: 'cad', label: 'CAD / DKA', icon: <Syringe className="h-4 w-4" /> },
     { id: 'eda', label: 'EDA / OMS', icon: <Stethoscope className="h-4 w-4" /> },
+    { id: 'equipamiento', label: 'Equipamiento', icon: <Wrench className="h-4 w-4" /> },
     { id: 'historial', label: 'Historial', icon: <Clock className="h-4 w-4" /> },
     { id: 'info', label: 'Información', icon: <HelpCircle className="h-4 w-4" /> },
   ] as const;
