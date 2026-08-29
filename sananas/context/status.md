@@ -18,7 +18,7 @@ All core development phases are completed. The application has been expanded fro
 - **Supabase Client & Fallback Service**: Configured in `src/lib/supabase.ts` with dynamic redirect helper.
 - **Global Patient State Provider**: Implemented in `src/context/PatientContext.tsx`.
 - **Patient Header Component**: Implemented with real-time BSA (Mosteller), safety alerts, dynamic user profile display, and a "Back to Main Menu" button.
-- **Clinical Modules**: Fully implemented (Maintenance, Burns, CAD, EDA/WHO, Equipment & Airway, Emergency Medications, Toxicology & Antidotes, PALS Resuscitation).
+- **Clinical Modules**: Fully implemented (Maintenance, Burns, CAD, EDA/WHO, Equipment & Airway, Emergency Medications, Toxicology & Antidotes, PALS Resuscitation, Info & Support).
 - **Consultations History Component**: Implemented with search, date filters, and expandables.
 - **Auth Screen**: Fully implemented with email/password login, Google OAuth, and an expanded clinical registration form (Full Name, Specialty, Hospital, Medical License).
 - **Main App Shell**: Assembled in `src/app/page.tsx` and `src/app/layout.tsx`.
@@ -44,6 +44,7 @@ All core development phases are completed. The application has been expanded fro
 - [x] Implement Pediatric Emergency Medications Module (`src/components/MedsModule.tsx`).
 - [x] Implement Pediatric Toxicology and Antidotes Module (`src/components/ToxicologyModule.tsx`).
 - [x] Implement Pediatric PALS Resuscitation Module (`src/components/PalsModule.tsx`).
+- [x] Organize and implement Standalone Info & Support Module (`src/components/InfoModule.tsx`) containing scientific references for all modules, disclaimers, privacy, and official support contact.
 - [x] Verify production build and compilation.
 
 ### To Do Immediately

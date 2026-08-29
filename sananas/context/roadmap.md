@@ -38,4 +38,5 @@
 - [x] Implementación del Módulo de Medicamentos de Urgencia Pediátrica.
 - [x] Implementación del Módulo de Toxicología y Antídotos Pediátricos.
 - [x] Implementación del Módulo de Reanimación PALS Pediátrica.
+- [x] Reorganización e Implementación del Módulo de Información, Legal y Soporte.
 - [ ] Configuración e integración de Capacitor para compilación nativa en iOS y Android (en rama de desarrollo).
