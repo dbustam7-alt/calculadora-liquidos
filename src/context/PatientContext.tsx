@@ -11,7 +11,7 @@ interface PatientState {
   heightCm: number;
   bsa: number;
   activeTab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'historial' | 'info';
-  currentModule: 'liquidos' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | null;
+  currentModule: 'liquidos' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'info' | null;
   history: PatientConsultation[];
   isLoadingHistory: boolean;
   user: SupabaseUser | null;
@@ -45,7 +45,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
 
   // App navigation
   const [activeTab, setActiveTabState] = useState<'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'historial' | 'info'>('dashboard');
-  const [currentModule, setCurrentModule] = useState<'liquidos' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | null>(null);
+  const [currentModule, setCurrentModule] = useState<'liquidos' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'info' | null>(null);
 
   const setActiveTab = (tab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'historial' | 'info') => {
     setActiveTabState(tab);
@@ -59,6 +59,10 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
       setCurrentModule('toxicologia');
     } else if (tab === 'pals') {
       setCurrentModule('pals');
+    } else if (tab === 'info') {
+      // If navigating to info directly, set currentModule to 'info' to isolate it
+      // but if we are already in a module, clicking 'info' tab preserves the module context
+      setCurrentModule((prev) => prev === null ? 'info' : prev);
     } else if (['mantenimiento', 'quemaduras', 'cad', 'eda'].includes(tab)) {
       setCurrentModule('liquidos');
     }

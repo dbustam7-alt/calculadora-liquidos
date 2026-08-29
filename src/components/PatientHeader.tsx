@@ -77,6 +77,10 @@ export default function PatientHeader() {
       // For PALS module, only show PALS, Historial, and Info
       return ['pals', 'historial', 'info'].includes(tab.id);
     }
+    if (currentModule === 'info') {
+      // For Info standalone module, only show Info
+      return ['info'].includes(tab.id);
+    }
     if (currentModule === 'liquidos') {
       // For Líquidos module, show everything except Equipamiento, Medicamentos, Toxicología and PALS
       return ['mantenimiento', 'quemaduras', 'cad', 'eda', 'historial', 'info'].includes(tab.id);

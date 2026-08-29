@@ -14,7 +14,8 @@ import {
   Moon, 
   User,
   Lock,
-  Wrench
+  Wrench,
+  HelpCircle
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -86,6 +87,17 @@ export default function Dashboard() {
       badge: 'Activo',
       badgeStyle: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/40',
       onClick: () => setActiveTab('toxicologia'),
+    },
+    {
+      id: 'info',
+      title: 'Información y Soporte',
+      description: 'Sustento científico detallado de cada módulo, términos de uso, descargo de responsabilidad médica, política de privacidad y canal de contacto de soporte.',
+      icon: <HelpCircle className="h-7 w-7 text-sky-500 dark:text-sky-400" />,
+      bgIcon: 'bg-sky-50 dark:bg-sky-950/30 border-sky-100 dark:border-sky-900/40',
+      active: true,
+      badge: 'Info',
+      badgeStyle: 'bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-400 border-sky-100 dark:border-sky-900/40',
+      onClick: () => setActiveTab('info'),
     },
   ];
 
