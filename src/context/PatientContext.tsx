@@ -10,8 +10,8 @@ interface PatientState {
   weightKg: number;
   heightCm: number;
   bsa: number;
-  activeTab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'historial' | 'info';
-  currentModule: 'liquidos' | 'equipamiento' | 'medicamentos' | 'toxicologia' | null;
+  activeTab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'historial' | 'info';
+  currentModule: 'liquidos' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | null;
   history: PatientConsultation[];
   isLoadingHistory: boolean;
   user: SupabaseUser | null;
@@ -23,7 +23,7 @@ interface PatientContextType extends PatientState {
   setAgeMonths: (months: number) => void;
   setWeightKg: (weight: number) => void;
   setHeightCm: (height: number) => void;
-  setActiveTab: (tab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'historial' | 'info') => void;
+  setActiveTab: (tab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'historial' | 'info') => void;
   saveCurrentConsultation: (
     type: 'mantenimiento' | 'quemaduras' | 'cad' | 'eda',
     details: Record<string, any>
@@ -44,10 +44,10 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
   const [bsa, setBsa] = useState<number>(0);
 
   // App navigation
-  const [activeTab, setActiveTabState] = useState<'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'historial' | 'info'>('dashboard');
-  const [currentModule, setCurrentModule] = useState<'liquidos' | 'equipamiento' | 'medicamentos' | 'toxicologia' | null>(null);
+  const [activeTab, setActiveTabState] = useState<'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'historial' | 'info'>('dashboard');
+  const [currentModule, setCurrentModule] = useState<'liquidos' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | null>(null);
 
-  const setActiveTab = (tab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'historial' | 'info') => {
+  const setActiveTab = (tab: 'dashboard' | 'mantenimiento' | 'quemaduras' | 'cad' | 'eda' | 'equipamiento' | 'medicamentos' | 'toxicologia' | 'pals' | 'historial' | 'info') => {
     setActiveTabState(tab);
     if (tab === 'dashboard') {
       setCurrentModule(null);
@@ -57,6 +57,8 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
       setCurrentModule('medicamentos');
     } else if (tab === 'toxicologia') {
       setCurrentModule('toxicologia');
+    } else if (tab === 'pals') {
+      setCurrentModule('pals');
     } else if (['mantenimiento', 'quemaduras', 'cad', 'eda'].includes(tab)) {
       setCurrentModule('liquidos');
     }

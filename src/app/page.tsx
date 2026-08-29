@@ -13,6 +13,7 @@ import Dashboard from '@/components/Dashboard';
 import EquipmentModule from '@/components/EquipmentModule';
 import MedsModule from '@/components/MedsModule';
 import ToxicologyModule from '@/components/ToxicologyModule';
+import PalsModule from '@/components/PalsModule';
 import AuthScreen from '@/components/AuthScreen';
 
 export default function Home() {
@@ -54,6 +55,8 @@ export default function Home() {
         return <MedsModule />;
       case 'toxicologia':
         return <ToxicologyModule />;
+      case 'pals':
+        return <PalsModule />;
       case 'historial':
         return <ConsultationsHistory />;
       case 'info':

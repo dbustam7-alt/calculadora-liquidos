@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePatient } from '@/context/PatientContext';
-import { Calendar, Weight, Ruler, Activity, Droplets, Flame, Syringe, Stethoscope, Clock, LogOut, Sun, Moon, HelpCircle, ArrowLeft, Wrench, ShieldAlert } from 'lucide-react';
+import { Calendar, Weight, Ruler, Activity, Droplets, Flame, Syringe, Stethoscope, Clock, LogOut, Sun, Moon, HelpCircle, ArrowLeft, Wrench, ShieldAlert, HeartPulse } from 'lucide-react';
 import ClinicalAlert from './ClinicalAlert';
 import { clsx } from 'clsx';
 
@@ -54,6 +54,7 @@ export default function PatientHeader() {
     { id: 'equipamiento', label: 'Equipamiento', icon: <Wrench className="h-4 w-4" /> },
     { id: 'medicamentos', label: 'Medicamentos', icon: <Syringe className="h-4 w-4" /> },
     { id: 'toxicologia', label: 'Toxicología', icon: <ShieldAlert className="h-4 w-4" /> },
+    { id: 'pals', label: 'PALS', icon: <HeartPulse className="h-4 w-4" /> },
     { id: 'historial', label: 'Historial', icon: <Clock className="h-4 w-4" /> },
     { id: 'info', label: 'Información', icon: <HelpCircle className="h-4 w-4" /> },
   ] as const;
@@ -72,8 +73,12 @@ export default function PatientHeader() {
       // For Toxicología module, only show Toxicología, Historial, and Info
       return ['toxicologia', 'historial', 'info'].includes(tab.id);
     }
+    if (currentModule === 'pals') {
+      // For PALS module, only show PALS, Historial, and Info
+      return ['pals', 'historial', 'info'].includes(tab.id);
+    }
     if (currentModule === 'liquidos') {
-      // For Líquidos module, show everything except Equipamiento, Medicamentos and Toxicología
+      // For Líquidos module, show everything except Equipamiento, Medicamentos, Toxicología and PALS
       return ['mantenimiento', 'quemaduras', 'cad', 'eda', 'historial', 'info'].includes(tab.id);
     }
     return true;
