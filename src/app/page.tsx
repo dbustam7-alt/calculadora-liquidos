@@ -12,6 +12,7 @@ import InfoModule from '@/components/InfoModule';
 import Dashboard from '@/components/Dashboard';
 import EquipmentModule from '@/components/EquipmentModule';
 import MedsModule from '@/components/MedsModule';
+import ToxicologyModule from '@/components/ToxicologyModule';
 import AuthScreen from '@/components/AuthScreen';
 
 export default function Home() {
@@ -51,6 +52,8 @@ export default function Home() {
         return <EquipmentModule />;
       case 'medicamentos':
         return <MedsModule />;
+      case 'toxicologia':
+        return <ToxicologyModule />;
       case 'historial':
         return <ConsultationsHistory />;
       case 'info':

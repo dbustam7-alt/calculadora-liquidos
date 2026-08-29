@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePatient } from '@/context/PatientContext';
-import { Calendar, Weight, Ruler, Activity, Droplets, Flame, Syringe, Stethoscope, Clock, LogOut, Sun, Moon, HelpCircle, ArrowLeft, Wrench } from 'lucide-react';
+import { Calendar, Weight, Ruler, Activity, Droplets, Flame, Syringe, Stethoscope, Clock, LogOut, Sun, Moon, HelpCircle, ArrowLeft, Wrench, ShieldAlert } from 'lucide-react';
 import ClinicalAlert from './ClinicalAlert';
 import { clsx } from 'clsx';
 
@@ -53,6 +53,7 @@ export default function PatientHeader() {
     { id: 'eda', label: 'EDA / OMS', icon: <Stethoscope className="h-4 w-4" /> },
     { id: 'equipamiento', label: 'Equipamiento', icon: <Wrench className="h-4 w-4" /> },
     { id: 'medicamentos', label: 'Medicamentos', icon: <Syringe className="h-4 w-4" /> },
+    { id: 'toxicologia', label: 'Toxicología', icon: <ShieldAlert className="h-4 w-4" /> },
     { id: 'historial', label: 'Historial', icon: <Clock className="h-4 w-4" /> },
     { id: 'info', label: 'Información', icon: <HelpCircle className="h-4 w-4" /> },
   ] as const;
@@ -67,8 +68,12 @@ export default function PatientHeader() {
       // For Medicamentos module, only show Medicamentos, Historial, and Info
       return ['medicamentos', 'historial', 'info'].includes(tab.id);
     }
+    if (currentModule === 'toxicologia') {
+      // For Toxicología module, only show Toxicología, Historial, and Info
+      return ['toxicologia', 'historial', 'info'].includes(tab.id);
+    }
     if (currentModule === 'liquidos') {
-      // For Líquidos module, show everything except Equipamiento and Medicamentos
+      // For Líquidos module, show everything except Equipamiento, Medicamentos and Toxicología
       return ['mantenimiento', 'quemaduras', 'cad', 'eda', 'historial', 'info'].includes(tab.id);
     }
     return true;

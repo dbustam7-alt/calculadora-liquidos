@@ -78,12 +78,13 @@ export default function Dashboard() {
     {
       id: 'toxicologia',
       title: 'Toxicología y Antídotos',
-      description: 'Manejo inicial de intoxicaciones comunes, cálculo de dosis de antídotos específicos, lavado gástrico, carbón activado y escalas de gravedad toxicológica.',
+      description: 'Manejo inicial de intoxicaciones comunes, cálculo de dosis de antídotos específicos (N-Acetilcisteína, Naloxona, Flumazenil), lavado gástrico, carbón activado y asistente de toxíndromes.',
       icon: <ShieldAlert className="h-7 w-7 text-violet-500 dark:text-violet-400" />,
       bgIcon: 'bg-violet-50 dark:bg-violet-950/30 border-violet-100 dark:border-violet-900/40',
-      active: false,
-      badge: 'Próximamente',
-      badgeStyle: 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700',
+      active: true,
+      badge: 'Activo',
+      badgeStyle: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/40',
+      onClick: () => setActiveTab('toxicologia'),
     },
   ];
 
